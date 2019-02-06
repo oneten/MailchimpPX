@@ -1,4 +1,4 @@
 
-Tools\PX.CstBuildProject.exe /website Site /in Customizations/Mailchimp /out Mailchimp.zip
+Tools\PX.CstBuildProject.exe /website Site /in CustomizationSource/Mailchimp /out Mailchimp.zip
 
 pause
