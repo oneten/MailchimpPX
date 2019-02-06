@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using MailChimp.Net;
+using MailChimp.Net.Core;
 using MailChimp.Net.Models;
 
 namespace MailchimpPXLib
@@ -15,6 +16,7 @@ namespace MailchimpPXLib
 
         public MailchimpPXManager(string apiKey)
         {
+            if (String.IsNullOrEmpty(apiKey)) throw new NoAPIKeyException();
             manager = new MailChimpManager(apiKey);
         }
 
@@ -24,6 +26,19 @@ namespace MailchimpPXLib
             return mc_lists.ToList();
         }
 
+        public List GetList(string listId)
+        {
+            List mc_list;
+            try
+            {
+                mc_list = Task.Run(async () => await manager.Lists.GetAsync(listId)).Result;
+            } catch (AggregateException ae)
+            {
+                throw ae.InnerException;
+            }
+            return mc_list;
+        }
+
         public Member GetMember(string listId, string email)
         {
             var email_md5 = CalculateMD5Hash(email);
@@ -31,6 +46,20 @@ namespace MailchimpPXLib
             try
             {
                 member = Task.Run(async () => await manager.Members.GetAsync(listId, email_md5)).Result;
+            }
+            catch (AggregateException ae) when (ae.InnerException is MailChimpNotFoundException)
+            {
+                // If fetching the member on the list doesn't find anything, try to get the list.
+                // If we can't find the list, then the list doesn't exist. Otherwise, the member doesn't exist on the list.
+                try
+                {
+                    GetList(listId);
+                }
+                catch (MailChimpNotFoundException)
+                {
+                    throw new ListDoesNotExistException();
+                }
+                throw new MemberDoesNotExistException();
             }
             catch (AggregateException ae)
             {

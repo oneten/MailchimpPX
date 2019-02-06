@@ -47,6 +47,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Exceptions\ListDoesNotExistException.cs" />
+    <Compile Include="Exceptions\MemberDoesNotExistException.cs" />
+    <Compile Include="Exceptions\NoAPIKeyException.cs" />
     <Compile Include="MailChimpPXManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
