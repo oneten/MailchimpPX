@@ -56,6 +56,6 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>del $(TargetDir)Newtonsoft.Json.*
-xcopy $(TargetDir)* $(SolutionDir)Customizations\Mailchimp\Bin\ /Y</PostBuildEvent>
+xcopy $(TargetDir)* $(SolutionDir)CustomizationSource\Mailchimp\Bin\ /Y</PostBuildEvent>
   </PropertyGroup>
 </Project>
