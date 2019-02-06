@@ -1,0 +1,7 @@
+﻿<DAC type="PX.Objects.CR.CRSetup">
+    <Field FieldName="UsrMailchimpAPIKey" TypeName="string" MapDbTable="CRSetup" TextAttributes="#CDATA" StorageName="AddColumn">
+        <CDATA name="TextAttributes"><![CDATA[[PXDBString(75)]
+[PXUIField(DisplayName="Mailchimp API Key")]
+]]></CDATA>
+    </Field>
+</DAC>
