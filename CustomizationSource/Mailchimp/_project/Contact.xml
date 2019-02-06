@@ -1,0 +1,4 @@
+﻿<Table TableName="Contact">
+    <Column TableName="Contact" ColumnName="UsrMailchimpListID" ColumnType="string" AllowNull="True" MaxLength="10" DecimalPrecision="2" DecimalLength="10" IsNewColumn="True" IsUnicode="True" />
+    <Column TableName="Contact" ColumnName="UsrMailchimpListStatus" ColumnType="string" AllowNull="True" MaxLength="25" DecimalPrecision="2" DecimalLength="25" IsNewColumn="True" IsUnicode="True" />
+</Table>
