@@ -1,0 +1,52 @@
+﻿<Graph ClassName="MailchimpContactMaint" Source="#CDATA" IsNew="True" FileType="ExistingGraph">
+    <CDATA name="Source"><![CDATA[using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using PX.Common;
+using PX.Data;
+using PX.Objects.AR;
+using PX.Objects.CR.MassProcess;
+using PX.Objects.GL;
+using PX.Objects.CS;
+using PX.Objects.EP;
+using PX.SM;
+using PX.Objects;
+using PX.Objects.CR;
+using MailchimpPXLib;
+
+namespace Mailchimp
+{
+  public class ContactMaint_Extension : PXGraphExtension<ContactMaint>
+  {
+
+        public PXSelect<CRSetup> Setup;
+        
+        public PXAction<Contact> getMailchimpStatus;
+        [PXUIField(DisplayName = "Get Mailchimp Status", MapEnableRights = PXCacheRights.Select, MapViewRights = PXCacheRights.Select)]
+        [PXButton]
+        public virtual IEnumerable GetMailchimpStatus(PXAdapter adapter)
+        {
+            Contact contact = Base.Contact.Current;
+            ContactExt ext = contact.GetExtension<ContactExt>();
+
+            CRSetup setup = Base.Setup.Current;
+            CRSetupExt setupExt = setup.GetExtension<CRSetupExt>();
+            var apiKey = setupExt.UsrMailchimpAPIKey;
+            var manager = new MailchimpPXManager(apiKey);
+
+            var member = manager.GetMember(ext.UsrMailchimpListID, contact.EMail);
+            ext.UsrMailchimpListStatus = member.Status.ToString();
+
+            Base.Actions.PressSave();
+
+            return adapter.Get();
+        }
+               
+
+        #region Event Handlers
+
+        #endregion
+    }
+}]]></CDATA>
+</Graph>
