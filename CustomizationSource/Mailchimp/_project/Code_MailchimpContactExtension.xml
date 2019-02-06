@@ -1,13 +1,11 @@
 ﻿<Graph ClassName="MailchimpContactExtension" Source="#CDATA" IsNew="True" FileType="NewFile">
-    <CDATA name="Source"><![CDATA[using PX.CS.Contracts.Interfaces;
-using PX.Data.EP;
+    <CDATA name="Source"><![CDATA[using PX.Data.EP;
 using PX.Data;
 using PX.Objects.AP;
 using PX.Objects.CR.MassProcess;
 using PX.Objects.CR;
 using PX.Objects.CS;
 using PX.Objects.EP;
-using PX.Objects.GDPR;
 using PX.Objects;
 using PX.SM;
 using PX.TM;
