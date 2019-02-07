@@ -1,0 +1,162 @@
+﻿<Graph ClassName="CRMailchimpList" Source="#CDATA" IsNew="True" FileType="NewDac">
+    <CDATA name="Source"><![CDATA[using System;
+using PX.Data;
+
+namespace Mailchimp
+{
+  [Serializable]
+  public class CRMailchimpList : IBqlTable
+  {
+    #region ListID
+    [PXDBString(10, IsUnicode = true, InputMask = "")]
+    [PXUIField(DisplayName = "List ID")]
+    public virtual string ListID { get; set; }
+    public abstract class listID : IBqlField { }
+    #endregion
+
+    #region ListCD
+    [PXDBString(100, IsUnicode = true, InputMask = "", IsKey = true)]
+    [PXUIField(DisplayName = "List Name")]
+    public virtual string ListCD { get; set; }
+    public abstract class listCD : IBqlField { }
+    #endregion
+
+    #region Tstamp
+    public abstract class Tstamp : PX.Data.IBqlField
+    {
+    }
+    protected Byte[] _tstamp;
+    [PXDBTimestamp()]
+    public virtual Byte[] tstamp
+    {
+      get
+      {
+        return this._tstamp;
+      }
+      set
+      {
+        this._tstamp = value;
+      }
+    }
+    #endregion
+
+    #region CreatedByID
+    public abstract class createdByID : PX.Data.IBqlField
+    {
+    }
+    protected Guid? _CreatedByID;
+    [PXDBCreatedByID()]
+    public virtual Guid? CreatedByID
+    {
+      get
+      {
+        return this._CreatedByID;
+      }
+      set
+      {
+        this._CreatedByID = value;
+      }
+    }
+    #endregion
+
+    #region CreatedByScreenID
+    [PXDBCreatedByScreenID()]
+    public virtual string CreatedByScreenID { get; set; }
+    public abstract class createdByScreenID : IBqlField { }
+    #endregion
+
+    #region CreatedDateTime
+    public abstract class createdDateTime : PX.Data.IBqlField
+    {
+    }
+    protected DateTime? _CreatedDateTime;
+    [PXDBCreatedDateTime()]
+    public virtual DateTime? CreatedDateTime
+    {
+      get
+      {
+        return this._CreatedDateTime;
+      }
+      set
+      {
+        this._CreatedDateTime = value;
+      }
+    }
+    #endregion
+
+    #region LastModifiedByID
+    [PXDBLastModifiedByID()]
+    public virtual Guid? LastModifiedByID { get; set; }
+    public abstract class lastModifiedByID : IBqlField { }
+    #endregion
+
+    #region LastModifiedByScreenID
+    [PXDBLastModifiedByScreenID()]
+    public virtual string LastModifiedByScreenID { get; set; }
+    public abstract class lastModifiedByScreenID : IBqlField { }
+    #endregion
+
+    #region LastModifiedDateTime
+    public abstract class lastModifiedDateTime : PX.Data.IBqlField
+    {
+    }
+    protected DateTime? _LastModifiedDateTime;
+    [PXDBLastModifiedDateTime()]
+    public virtual DateTime? LastModifiedDateTime
+    {
+      get
+      {
+        return this._LastModifiedDateTime;
+      }
+      set
+      {
+        this._LastModifiedDateTime = value;
+      }
+    }
+    #endregion
+
+    #region Noteid
+    //[PXDBGuid()]
+    //[PXUIField(DisplayName = "Noteid")]
+    [PXNote(DescriptionField = typeof(CRMailchimpList.listCD))]
+    public virtual Guid? NoteID { get; set; }
+    public abstract class noteID : IBqlField { }
+    #endregion
+
+    #region MemberCount
+    [PXDBInt()]
+    [PXUIField(DisplayName = "Member Count")]
+    public virtual int? MemberCount { get; set; }
+    public abstract class memberCount : IBqlField { }
+    #endregion
+
+    #region UnsubscribeCount
+    [PXDBInt()]
+    [PXUIField(DisplayName = "Unsubscribe Count")]
+    public virtual int? UnsubscribeCount { get; set; }
+    public abstract class unsubscribeCount : IBqlField { }
+    #endregion
+
+    #region CleanedCount
+    [PXDBInt()]
+    [PXUIField(DisplayName = "Cleaned Count")]
+    public virtual int? CleanedCount { get; set; }
+    public abstract class cleanedCount : IBqlField { }
+    #endregion
+
+    #region CampaignCount
+    [PXDBInt()]
+    [PXUIField(DisplayName = "Campaign Count")]
+    public virtual int? CampaignCount { get; set; }
+    public abstract class campaignCount : IBqlField { }
+    #endregion
+
+    #region CampaignLastSent
+    [PXDBString(27, IsUnicode = true, InputMask = "")]
+    [PXUIField(DisplayName = "Campaign Last Sent")]
+    public virtual string CampaignLastSent { get; set; }
+    public abstract class campaignLastSent : IBqlField { }
+    #endregion
+  }
+}]]></CDATA>
+</Graph>

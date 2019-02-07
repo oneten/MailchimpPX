@@ -1,0 +1,26 @@
+﻿<Sql TableName="CRMailchimpList" TableSchemaXml="#CDATA">
+    <CDATA name="TableSchemaXml"><![CDATA[<table name="CRMailchimpList">
+  <col name="CompanyID" type="Int" default="Zero" />
+  <col name="ListID" type="NVarChar(10)" />
+  <col name="ListCD" type="NVarChar(100)" nullable="true" />
+  <col name="tstamp" type="Timestamp" />
+  <col name="CreatedByID" type="UniqueIdentifier" />
+  <col name="CreatedByScreenID" type="Char(8)" />
+  <col name="CreatedDateTime" type="DateTime" />
+  <col name="LastModifiedByID" type="UniqueIdentifier" />
+  <col name="LastModifiedByScreenID" type="Char(8)" />
+  <col name="LastModifiedDateTime" type="DateTime" />
+  <col name="NoteID" type="UniqueIdentifier" nullable="true" />
+  <col name="MemberCount" type="Int" nullable="true" />
+  <col name="UnsubscribeCount" type="Int" nullable="true" />
+  <col name="CleanedCount" type="Int" nullable="true" />
+  <col name="CampaignCount" type="Int" nullable="true" />
+  <col name="CampaignLastSent" type="NVarChar(27)" nullable="true" />
+  <col name="OpenRate" type="Float" nullable="true" />
+  <col name="ClickRate" type="Float" nullable="true" />
+  <index name="PK_CRMailchimpList" clustered="true" primary="true" unique="true">
+    <col name="ListID" />
+    <col name="CompanyID" />
+  </index>
+</table>]]></CDATA>
+</Sql>
