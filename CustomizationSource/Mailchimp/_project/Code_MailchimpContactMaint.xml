@@ -53,7 +53,7 @@ namespace Mailchimp
         
         public PXAction<Contact> SyncMailchimpStatus;
         [PXProcessButton]
-        [PXUIField(DisplayName = "Process")]
+        [PXUIField(DisplayName = "Sync Mailchimp")]
         protected virtual IEnumerable syncMailchimpStatus(PXAdapter adapter)
         {
             foreach (Contact contact in adapter.Get())
