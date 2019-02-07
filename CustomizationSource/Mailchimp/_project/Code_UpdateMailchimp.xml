@@ -1,0 +1,60 @@
+﻿<Graph ClassName="UpdateMailchimp" Source="#CDATA" IsNew="True" FileType="NewGraph">
+    <CDATA name="Source"><![CDATA[using System;
+using PX.Data;
+using PX.Objects.CR;
+
+namespace Mailchimp
+{
+  public class UpdateMailchimp : PXGraph<UpdateMailchimp>
+  {
+        //public PXSave<Contact> Save;
+        public PXCancel<Contact> Cancel;
+        public PXProcessing<Contact, Where<ContactExt.usrMailchimpListID, IsNotNull>> Contacts;
+
+        public PXFilter<ContactMailchimpProcessFilter> ProcessFilter;
+        //public PXFilter<DetailsTable> DetailsView;
+
+        [Serializable]
+        public class ContactMailchimpProcessFilter : IBqlTable
+        {
+            #region Action
+            public abstract class action : PX.Data.IBqlField
+            {
+            }
+            protected string _Action;
+            [PXAutomationMenu]
+            public virtual string Action
+            {
+                get
+                {
+                    return this._Action;
+                }
+                set
+                {
+                    this._Action = value;
+                }
+            }
+            #endregion
+        }
+
+        /* [Serializable]
+         public class DetailsTable : IBqlTable
+         {
+
+         }*/
+
+        public UpdateMailchimp()
+        {
+            Contacts.SetProcessDelegate<ContactMaint>(
+                delegate (ContactMaint graph, Contact contact)
+                {
+                    graph.Clear();
+                    ContactMaint_Extension graphExt = graph.GetExtension<ContactMaint_Extension>();
+                    graphExt.getMailchimpStatus(contact, true);
+                });
+        }
+
+
+    }
+}]]></CDATA>
+</Graph>

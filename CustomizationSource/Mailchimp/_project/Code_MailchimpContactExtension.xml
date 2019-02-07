@@ -29,7 +29,7 @@ namespace Mailchimp
 
     #region UsrMailchimpListStatus
     [PXDBString(25)]
-    [PXUIField(DisplayName="Mailchimp List Status", Enabled=false)]
+    [PXUIField(DisplayName="Mailchimp List Status"/*, Enabled=false*/)]
     public virtual string UsrMailchimpListStatus { get; set; }
     public abstract class usrMailchimpListStatus : IBqlField { }
     #endregion

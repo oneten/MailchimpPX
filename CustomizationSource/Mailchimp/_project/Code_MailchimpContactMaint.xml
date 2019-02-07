@@ -2,6 +2,7 @@
     <CDATA name="Source"><![CDATA[using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using PX.Common;
 using PX.Data;
@@ -22,27 +23,56 @@ namespace Mailchimp
 
         public PXSelect<CRSetup> Setup;
         
-        public PXAction<Contact> getMailchimpStatus;
-        [PXUIField(DisplayName = "Get Mailchimp Status", MapEnableRights = PXCacheRights.Select, MapViewRights = PXCacheRights.Select)]
-        [PXButton]
-        public virtual IEnumerable GetMailchimpStatus(PXAdapter adapter)
+        public void getMailchimpStatus(Contact contact, bool isMassProcess = false)
         {
-            Contact contact = Base.Contact.Current;
+
+            Base.ContactCurrent.Current = contact;
             ContactExt ext = contact.GetExtension<ContactExt>();
 
             CRSetup setup = Base.Setup.Current;
             CRSetupExt setupExt = setup.GetExtension<CRSetupExt>();
+
             var apiKey = setupExt.UsrMailchimpAPIKey;
             var manager = new MailchimpPXManager(apiKey);
 
             var member = manager.GetMember(ext.UsrMailchimpListID, contact.EMail);
-            ext.UsrMailchimpListStatus = member.Status.ToString();
 
-            Base.Actions.PressSave();
+            Base.ContactCurrent.Cache.SetValue(contact, "UsrMailchimpListStatus", member.Status.ToString());
+            Base.ContactCurrent.Update(contact);
+            Base.ContactCurrent.Cache.IsDirty = true;
+            Base.Persist();
 
-            return adapter.Get();
+            if (isMassProcess)
+            {
+                PXProcessing.SetInfo(String.Format(
+                    "Contact {0} has been updated.",
+                    contact.DisplayName));
+            }
         }
-               
+
+        
+        public PXAction<Contact> SyncMailchimpStatus;
+        [PXProcessButton]
+        [PXUIField(DisplayName = "Process")]
+        protected virtual IEnumerable syncMailchimpStatus(PXAdapter adapter)
+        {
+            foreach (Contact contact in adapter.Get())
+            {
+                this.Base.Actions.PressSave();
+
+                PXLongOperation.StartOperation(Base, delegate ()
+                {
+                    ContactMaint graph = PXGraph.CreateInstance<ContactMaint>();
+                    ContactMaint_Extension graphExt = graph.GetExtension<ContactMaint_Extension>();
+                    graphExt.getMailchimpStatus(contact);
+                });
+
+                yield return contact;
+            }
+        }
+
+
+
 
         #region Event Handlers
 
