@@ -1,0 +1,63 @@
+﻿<Graph ClassName="MailchimpListMaint" Source="#CDATA" IsNew="True" FileType="NewGraph">
+    <CDATA name="Source"><![CDATA[using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using PX.Common;
+using PX.Data;
+using PX.Objects.CR;
+using MailchimpPXLib;
+using PX.Objects.IN;
+
+
+namespace Mailchimp
+{
+    public class MailchimpListMaint : PXGraph<MailchimpListMaint>
+    {
+        public PXSave<CRMailchimpList> Save;
+        public PXCancel<CRMailchimpList> Cancel;
+
+        #region Selects
+
+        public PXSelect<CRMailchimpList> Lists;
+
+        [PXHidden]
+        public PX.Objects.IN.PXSetupOptional<CRSetup> Setup;
+
+        #endregion
+
+        public PXAction<CRMailchimpList> getLists;
+        [PXUIField(DisplayName = "Get Lists", MapEnableRights = PXCacheRights.Select, MapViewRights = PXCacheRights.Select)]
+        [PXButton]
+        public virtual IEnumerable GetLists(PXAdapter adapter)
+        {
+
+            CRSetup setup = Setup.Current;
+            CRSetupExt setupExt = setup.GetExtension<CRSetupExt>();
+
+            var apiKey = setupExt.UsrMailchimpAPIKey;
+            var manager = new MailchimpPXManager(apiKey);
+
+            // TODO - Handle refresh appropriately if list already exists in Acumatica
+           
+            foreach (var mailchimpList in manager.GetLists())
+            {
+                var acumaticaList = new CRMailchimpList();
+                acumaticaList.ListID = mailchimpList.Id;
+                acumaticaList.ListCD = mailchimpList.Name;
+                acumaticaList.MemberCount = mailchimpList.Stats.MemberCount;
+                acumaticaList.UnsubscribeCount = mailchimpList.Stats.UnsubscribeCount;
+                acumaticaList.CleanedCount = mailchimpList.Stats.CleanedCount;
+                acumaticaList.CampaignCount = mailchimpList.Stats.CampaignCount;
+                acumaticaList.CampaignLastSent = mailchimpList.Stats.CampaignLastSent;
+                acumaticaList = Lists.Insert(acumaticaList);
+            }
+            this.Actions.PressSave();
+
+            return adapter.Get();
+
+
+        }
+    }
+}]]></CDATA>
+</Graph>
