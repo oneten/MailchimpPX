@@ -19,6 +19,8 @@ namespace Mailchimp
   {
     #region UsrMailchimpListID
     [PXDBString(10)]
+    [PXSelector(typeof(Search<CRMailchimpList.listID>),
+            SubstituteKey = typeof(CRMailchimpList.listCD))]
     [PXUIField(DisplayName="Mailchimp List")]
 
     public virtual string UsrMailchimpListID { get; set; }
