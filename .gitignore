@@ -263,4 +263,5 @@ __pycache__/
 # Acumatica
 Site/*
 Customization/
+Customizations/
 Mailchimp.zip
