@@ -125,7 +125,7 @@ namespace Mailchimp
 
     #region MemberCount
     [PXDBInt()]
-    [PXUIField(DisplayName = "Member Count")]
+    [PXUIField(DisplayName = "Active Member Count")]
     public virtual int? MemberCount { get; set; }
     public abstract class memberCount : IBqlField { }
     #endregion
