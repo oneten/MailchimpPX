@@ -1,6 +1,7 @@
 ﻿<Graph ClassName="MailchimpListMaint" Source="#CDATA" IsNew="True" FileType="NewGraph">
     <CDATA name="Source"><![CDATA[using System;
 using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
 using PX.Common;
@@ -31,7 +32,6 @@ namespace Mailchimp
         [PXButton]
         public virtual IEnumerable GetLists(PXAdapter adapter)
         {
-
             CRSetup setup = Setup.Current;
             CRSetupExt setupExt = setup.GetExtension<CRSetupExt>();
 
@@ -40,14 +40,16 @@ namespace Mailchimp
 
             // TODO: Sometimes get error "API key cannot be empty" - refreshing and trying again solves it, but not sure what's going on here
 
+            var existingLists = PXSelect<CRMailchimpList>.Select(this).ToList();
+            CRMailchimpList acumaticaList;
+
             foreach (var mailchimpList in manager.GetLists())
             {
-                CRMailchimpList acumaticaList = new CRMailchimpList();
-                CRMailchimpList existingList = PXSelect<CRMailchimpList,
-                    Where<CRMailchimpList.listID, Equal<Required<CRMailchimpList.listID>>>>.Select(this, mailchimpList.Id);
-
+                var existingList = existingLists.Find(x => ((CRMailchimpList)x).ListID == mailchimpList.Id);
                 if (existingList != null)
                     acumaticaList = existingList;
+                else
+                    acumaticaList = new CRMailchimpList();
 
                 acumaticaList.ListID = mailchimpList.Id;
                 acumaticaList.ListCD = mailchimpList.Name;
@@ -56,7 +58,7 @@ namespace Mailchimp
                 acumaticaList.CleanedCount = mailchimpList.Stats.CleanedCount;
                 acumaticaList.CampaignCount = mailchimpList.Stats.CampaignCount;
                 acumaticaList.CampaignLastSent = mailchimpList.Stats.CampaignLastSent; // TODO: So far haven't been able to get any data from Mailchimp for this - maybe remove this field?
-                
+
                 if (existingList == null)
                     acumaticaList = Lists.Insert(acumaticaList);
 
