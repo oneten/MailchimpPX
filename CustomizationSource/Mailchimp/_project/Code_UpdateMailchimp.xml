@@ -47,7 +47,7 @@ namespace Mailchimp
         public static void Process(List<Contact> contacts)
         {
             var graph = PXGraph.CreateInstance<ContactMaint>();
-            //bool errorOccurred = false;
+            bool errorOccurred = false;
             
             ContactExt ext;
             ContactMaint_Extension graphExt = graph.GetExtension<ContactMaint_Extension>();
@@ -58,15 +58,25 @@ namespace Mailchimp
             
             foreach (var contact in contacts)
             {
-                ext = contact.GetExtension<ContactExt>();
-                var member = manager.GetMember(ext.UsrMailchimpListID, contact.EMail);
+                try
+                {
+                    ext = contact.GetExtension<ContactExt>();
+                    var member = manager.GetMember(ext.UsrMailchimpListID, contact.EMail);
 
-                graphExt.SetMailchimpStatus(contact, member.Status.ToString());
+                    graphExt.SetMailchimpStatus(contact, member.Status.ToString());
 
-                PXProcessing.SetInfo(String.Format(
-                    "Contact {0} has been updated.",
-                    contact.DisplayName));
+                    PXProcessing.SetInfo(String.Format(
+                        "Contact {0} has been updated.",
+                        contact.DisplayName));
+                }
+                catch (Exception ex)
+                {
+                    errorOccurred = true;
+                    PXProcessing.SetError(contacts.IndexOf(contact), ex.InnerException);
+                }
             }
+            if (errorOccurred)
+                throw new PXException("At least one contact hasn't been processed.");
         }
 
         public UpdateMailchimp()
