@@ -1,0 +1,6 @@
+﻿<Table TableName="CRActivity">
+    <Column TableName="CRActivity" ColumnName="UsrMailchimpAction" ColumnType="string" AllowNull="True" MaxLength="25" DecimalPrecision="2" DecimalLength="25" IsNewColumn="True" IsUnicode="True" />
+    <Column TableName="CRActivity" ColumnName="UsrMailchimpTimestamp" ColumnType="string" AllowNull="True" MaxLength="25" DecimalPrecision="2" DecimalLength="25" IsNewColumn="True" IsUnicode="True" />
+    <Column TableName="CRActivity" ColumnName="UsrMailchimpClickURL" ColumnType="string" AllowNull="True" MaxLength="200" DecimalPrecision="2" DecimalLength="200" IsNewColumn="True" IsUnicode="True" />
+    <Column TableName="CRActivity" ColumnName="UsrMailchimpCampaignID" ColumnType="string" AllowNull="True" MaxLength="10" DecimalPrecision="2" DecimalLength="10" IsNewColumn="True" IsUnicode="True" />
+</Table>

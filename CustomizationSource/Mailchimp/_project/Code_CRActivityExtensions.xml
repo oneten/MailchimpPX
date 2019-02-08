@@ -1,0 +1,55 @@
+﻿<Graph ClassName="CRActivityExtensions" Source="#CDATA" IsNew="True" FileType="NewFile">
+    <CDATA name="Source"><![CDATA[using PX.Common;
+using PX.Data.EP;
+using PX.Data;
+using PX.Objects.CR;
+using PX.Objects.CS;
+using PX.Objects.CT;
+using PX.Objects.EP;
+using PX.Objects.GL;
+using PX.Objects.PM;
+using PX.Objects;
+using PX.SM;
+using PX.TM;
+using PX.Web.UI;
+using System.Collections.Generic;
+using System;
+
+namespace Mailchimp
+{
+  public class CRActivityExt : PXCacheExtension<PX.Objects.CR.CRActivity>
+  {
+    #region UsrMailchimpAction
+    [PXDBString(25)]
+    [PXUIField(DisplayName="Mailchimp Action")]
+
+    public virtual string UsrMailchimpAction { get; set; }
+    public abstract class usrMailchimpAction : IBqlField { }
+    #endregion
+
+    #region UsrMailchimpTimestamp
+    [PXDBString(25)]
+    [PXUIField(DisplayName="Mailchimp Timestamp")]
+
+    public virtual string UsrMailchimpTimestamp { get; set; }
+    public abstract class usrMailchimpTimestamp : IBqlField { }
+    #endregion
+
+    #region UsrMailchimpClickURL
+    [PXDBString(200)]
+    [PXUIField(DisplayName="Mailchimp Click URL")]
+
+    public virtual string UsrMailchimpClickURL { get; set; }
+    public abstract class usrMailchimpClickURL : IBqlField { }
+    #endregion
+
+    #region UsrMailchimpCampaignID
+    [PXDBString(10)]
+    [PXUIField(DisplayName="MailchimpCampaignID")]
+
+    public virtual string UsrMailchimpCampaignID { get; set; }
+    public abstract class usrMailchimpCampaignID : IBqlField { }
+    #endregion
+  }
+}]]></CDATA>
+</Graph>
