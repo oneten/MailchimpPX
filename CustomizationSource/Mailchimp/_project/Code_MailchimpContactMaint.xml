@@ -75,6 +75,93 @@ namespace Mailchimp
             }
         }
 
+        #region Get Mailchimp Activities
+
+        List<MailChimp.Net.Models.Activity> activityList = new List<MailChimp.Net.Models.Activity>();
+
+        public PXAction<PX.Objects.CR.Contact> SyncMailchimpActivities;
+        [PXButton(CommitChanges = true)]
+        [PXUIField(DisplayName = "Sync MC Activities")]
+        protected void syncMailchimpActivities()
+        {
+
+            Contact contact = Base.Contact.Current;
+            ContactExt ext = contact.GetExtension<ContactExt>();
+
+            CRSetup setup = Base.Setup.Current;
+            CRSetupExt setupExt = setup.GetExtension<CRSetupExt>();
+
+            var apiKey = setupExt.UsrMailchimpAPIKey;
+            var manager = new MailchimpPXManager(apiKey);
+
+            try
+            {
+                PXLongOperation.StartOperation(Base, delegate
+                {
+                    CRMailchimpList list = PXSelect<CRMailchimpList, 
+                        Where<CRMailchimpList.listID, Equal<Required<CRMailchimpList.listID>>>>.Select(Base, ext.UsrMailchimpListID);
+
+                    var activities = manager.GetActivities(list.ListID, Base.Contact.Current.EMail);
+                    if (activities != null)
+                    {
+                        CRActivityMaint graph = PXGraph.CreateInstance<CRActivityMaint>();
+                        registerActivities(activities.ToList(), graph, Base);
+                    }
+
+                });
+
+            }
+            catch (Exception ex)
+            {
+                string err = ex.InnerException.ToString();
+                throw ex;
+            }
+        }
+
+        public bool activityExist(MailChimp.Net.Models.Activity activity, ContactMaint baseGraph)
+        {
+            // TODO - do we want to change this to just say get everything greater than the latest timestamp? 
+            // Maybe more efficient. But there is the potential for someone to delete mailchimp activities after they are pulled into Acumatica, so maybe a full check is good?
+            foreach (CRActivity acumaticaActivity in baseGraph.Activities.Select())
+            {
+                CRActivityExt acumaticaActivityExt = acumaticaActivity.GetExtension<CRActivityExt>(); // TODO - only compare against mailchimp activities
+
+                if (activity.Timestamp == acumaticaActivityExt.UsrMailchimpTimestamp)
+                    return true;
+            }
+            return false;
+        }
+
+        public void registerActivities(List<MailChimp.Net.Models.Activity> result, CRActivityMaint graph, ContactMaint baseGraph)
+        {
+            bool isInserted = false;
+            foreach (MailChimp.Net.Models.Activity activity in result)
+            {
+                 //Check if it already exist by UsrMCTimestamp
+                if (!activityExist(activity, baseGraph))
+                {
+                    //Insert Activity to Acumatica
+                    CRActivity cRActivity = new CRActivity();
+                    CRActivityExt ext = PXCache<CRActivity>.GetExtension<CRActivityExt>(cRActivity);
+
+                    //cRActivity.NoteID = baseGraph.Contact.Current.NoteID;
+                    cRActivity.Subject = activity.Action + " - " + activity.Title; //TODO - make this a nice readable string similar to the way it reads in Acumatica
+                    cRActivity.ContactID = baseGraph.Contact.Current.ContactID;
+                    cRActivity.BAccountID = baseGraph.Contact.Current.BAccountID;
+
+                    ext.UsrMailchimpAction = activity.Action;
+                    ext.UsrMailchimpCampaignID = activity.CampaignId;
+                    ext.UsrMailchimpTimestamp = activity.Timestamp;
+
+                    cRActivity = graph.Activities.Insert(cRActivity);
+                    isInserted = true;
+                }
+            }
+            if (isInserted)
+                graph.Actions.PressSave();
+        }
+        #endregion
+
         #region Event Handlers
 
         #endregion
