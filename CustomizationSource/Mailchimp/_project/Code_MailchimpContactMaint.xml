@@ -23,31 +23,35 @@ namespace Mailchimp
 
         public PXSelect<CRSetup> Setup;
         
-        public void getMailchimpStatus(Contact contact, bool isMassProcess = false)
+        public void getMailchimpStatus(Contact contact)
         {
-
             Base.ContactCurrent.Current = contact;
             ContactExt ext = contact.GetExtension<ContactExt>();
 
+            var manager = GetManager();
+            var member = manager.GetMember(ext.UsrMailchimpListID, contact.EMail);
+
+            SetMailchimpStatus(contact, member.Status.ToString());
+        }
+
+        public void SetMailchimpStatus(Contact contact, string status)
+        {
+            Base.Contact.Current = contact;
+            ContactExt ext = contact.GetExtension<ContactExt>();
+
+            ext.UsrMailchimpListStatus = status;
+            Base.ContactCurrent.Update(contact);
+            Base.Save.Press();
+        }
+
+        // Given a Contact maintenance page, return a Mailchimp manager
+        public MailchimpPXManager GetManager()
+        {
             CRSetup setup = Base.Setup.Current;
             CRSetupExt setupExt = setup.GetExtension<CRSetupExt>();
 
             var apiKey = setupExt.UsrMailchimpAPIKey;
-            var manager = new MailchimpPXManager(apiKey);
-
-            var member = manager.GetMember(ext.UsrMailchimpListID, contact.EMail);
-
-            Base.ContactCurrent.Cache.SetValue(contact, "UsrMailchimpListStatus", member.Status.ToString());
-            Base.ContactCurrent.Update(contact);
-            Base.ContactCurrent.Cache.IsDirty = true;
-            Base.Persist();
-
-            if (isMassProcess)
-            {
-                PXProcessing.SetInfo(String.Format(
-                    "Contact {0} has been updated.",
-                    contact.DisplayName));
-            }
+            return new MailchimpPXManager(apiKey);
         }
 
         
@@ -70,9 +74,6 @@ namespace Mailchimp
                 yield return contact;
             }
         }
-
-
-
 
         #region Event Handlers
 

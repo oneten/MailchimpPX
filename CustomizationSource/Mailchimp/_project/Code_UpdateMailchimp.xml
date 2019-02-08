@@ -1,5 +1,6 @@
 ﻿<Graph ClassName="UpdateMailchimp" Source="#CDATA" IsNew="True" FileType="NewGraph">
     <CDATA name="Source"><![CDATA[using System;
+using System.Collections.Generic;
 using PX.Data;
 using PX.Objects.CR;
 
@@ -43,18 +44,35 @@ namespace Mailchimp
 
          }*/
 
-        public UpdateMailchimp()
+        public static void Process(List<Contact> contacts)
         {
-            Contacts.SetProcessDelegate<ContactMaint>(
-                delegate (ContactMaint graph, Contact contact)
-                {
-                    graph.Clear();
-                    ContactMaint_Extension graphExt = graph.GetExtension<ContactMaint_Extension>();
-                    graphExt.getMailchimpStatus(contact, true);
-                });
+            var graph = PXGraph.CreateInstance<ContactMaint>();
+            //bool errorOccurred = false;
+            
+            ContactExt ext;
+            ContactMaint_Extension graphExt = graph.GetExtension<ContactMaint_Extension>();
+            
+            var manager = graphExt.GetManager();
+            
+            // TODO Update the Mailchimp Lists table first
+            
+            foreach (var contact in contacts)
+            {
+                ext = contact.GetExtension<ContactExt>();
+                var member = manager.GetMember(ext.UsrMailchimpListID, contact.EMail);
+
+                graphExt.SetMailchimpStatus(contact, member.Status.ToString());
+
+                PXProcessing.SetInfo(String.Format(
+                    "Contact {0} has been updated.",
+                    contact.DisplayName));
+            }
         }
 
-
+        public UpdateMailchimp()
+        {
+            Contacts.SetProcessDelegate(Process);
+        }
     }
 }]]></CDATA>
 </Graph>
