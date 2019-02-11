@@ -3,6 +3,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using PX.Common;
 using PX.Data;
@@ -94,6 +95,10 @@ namespace Mailchimp
             var apiKey = setupExt.UsrMailchimpAPIKey;
             var manager = new MailchimpPXManager(apiKey);
 
+            EPActivityType activityType = getOrCreateMailchimpActivityType();
+
+            // TODO - make sure the contact is on a mailchimp list before trying to get activities
+
             try
             {
                 PXLongOperation.StartOperation(Base, delegate
@@ -105,7 +110,7 @@ namespace Mailchimp
                     if (activities != null)
                     {
                         CRActivityMaint graph = PXGraph.CreateInstance<CRActivityMaint>();
-                        registerActivities(activities.ToList(), graph, Base);
+                        registerActivities(activities.ToList(), activityType, graph, Base);
                     }
 
                 });
@@ -116,6 +121,35 @@ namespace Mailchimp
                 string err = ex.InnerException.ToString();
                 throw ex;
             }
+        }
+
+        private EPActivityType getOrCreateMailchimpActivityType()
+        {
+            EPActivityType mailChimpActivityType = new EPActivityType();
+            CRActivitySetupMaint graph = PXGraph.CreateInstance<CRActivitySetupMaint>();
+
+            EPActivityType existingType = PXSelect<EPActivityType,
+                Where<EPActivityType.type, Equal <Required<EPActivityType.type>>>>.Select(Base, "MC");
+
+            if (existingType != null)
+            {
+                mailChimpActivityType = existingType; // TODO: should we make sure this is active or update any other fields here?
+            }
+            else
+            {
+                mailChimpActivityType.Type = "MC";
+                mailChimpActivityType.Description = "Mailchimp";
+                mailChimpActivityType.Active = true;
+                mailChimpActivityType.ImageUrl = "main@Activity";
+                mailChimpActivityType.Incoming = true;
+                mailChimpActivityType.Outgoing = true;
+
+                graph.ActivityTypes.Insert(mailChimpActivityType);
+                graph.Actions.PressSave();
+
+            }
+
+            return mailChimpActivityType;
         }
 
         public bool activityExist(MailChimp.Net.Models.Activity activity, ContactMaint baseGraph)
@@ -132,9 +166,12 @@ namespace Mailchimp
             return false;
         }
 
-        public void registerActivities(List<MailChimp.Net.Models.Activity> result, CRActivityMaint graph, ContactMaint baseGraph)
+        public void registerActivities(List<MailChimp.Net.Models.Activity> result, EPActivityType activityType, CRActivityMaint graph, ContactMaint baseGraph)
         {
             bool isInserted = false;
+
+            // TODO - insert activities in order from earliest to latest so that more recent activities are shown at the top of the Activities tab for the contact
+
             foreach (MailChimp.Net.Models.Activity activity in result)
             {
                  //Check if it already exist by UsrMCTimestamp
@@ -144,22 +181,47 @@ namespace Mailchimp
                     CRActivity cRActivity = new CRActivity();
                     CRActivityExt ext = PXCache<CRActivity>.GetExtension<CRActivityExt>(cRActivity);
 
-                    //cRActivity.NoteID = baseGraph.Contact.Current.NoteID;
-                    cRActivity.Subject = activity.Action + " - " + activity.Title; //TODO - make this a nice readable string similar to the way it reads in Acumatica
+                    TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
+                    DateTime parsedDateTime = DateTime.ParseExact(activity.Timestamp, "yyyy-MM-ddTHH:mm:sszzzz", CultureInfo.InvariantCulture);
+
+                    cRActivity.Type = activityType.Type;
+                    cRActivity.Subject = createActivitySubject(activity.Action, activity.Title);  
                     cRActivity.ContactID = baseGraph.Contact.Current.ContactID;
                     cRActivity.BAccountID = baseGraph.Contact.Current.BAccountID;
+                    cRActivity.StartDate = parsedDateTime;
 
-                    ext.UsrMailchimpAction = activity.Action;
+                    ext.UsrMailchimpAction = textInfo.ToTitleCase(activity.Action.ToLower());
                     ext.UsrMailchimpCampaignID = activity.CampaignId;
                     ext.UsrMailchimpTimestamp = activity.Timestamp;
+                    //ext.UsrMailchimpClickURL = activity.Url; // TODO - URL is not currently being returned from Mailchimp. To get it, we would need to extend the package
 
                     cRActivity = graph.Activities.Insert(cRActivity);
                     isInserted = true;
+
                 }
             }
             if (isInserted)
                 graph.Actions.PressSave();
         }
+
+        private string createActivitySubject(string action, string title) 
+        {
+            action = mailChimpActionDict.ContainsKey(action) ? mailChimpActionDict[action] : action;
+            string subject = action + title;
+
+            return subject;
+        }
+
+        IDictionary<string, string> mailChimpActionDict = new Dictionary<string, string>()
+        {
+            {"sent", "Was Sent the email " },
+            {"open", "Opened the email " },
+            {"click", "Clicked on a link from the email " },
+            {"bounce", "Bounced email " },
+            {"unsub", "Unsubscribed" }
+
+        };
+
         #endregion
 
         #region Event Handlers
