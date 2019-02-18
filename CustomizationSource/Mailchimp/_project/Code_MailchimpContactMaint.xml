@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using PX.Common;
 using PX.Data;
 using PX.Objects.AR;
@@ -23,7 +24,16 @@ namespace Mailchimp
   {
 
         public PXSelect<CRSetup> Setup;
-        
+
+        public class ContactMaintPXExt : PXGraphExtension<ContactMaint>
+        {
+            public override void Initialize()
+            {
+                // Sort Activities by StartDate (default is CreatedDateTime) so that Mailchimp Activities show up in sequence with pre-existing Acumatica Activites
+                Base.Activities.OrderByNew<OrderBy<Desc<CRActivity.startDate>>>();
+            }
+        }
+
         public void getMailchimpStatus(Contact contact)
         {
             Base.ContactCurrent.Current = contact;
@@ -170,7 +180,8 @@ namespace Mailchimp
         {
             bool isInserted = false;
 
-            // TODO - insert activities in order from earliest to latest so that more recent activities are shown at the top of the Activities tab for the contact
+            // Insert activities in order from earliest to latest so that more recent activities are shown at the top of the Activities tab for the contact
+            result = result.OrderBy(n => n.Timestamp).ToList();
 
             foreach (MailChimp.Net.Models.Activity activity in result)
             {
