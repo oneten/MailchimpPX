@@ -200,6 +200,7 @@ namespace Mailchimp
                     cRActivity.ContactID = baseGraph.Contact.Current.ContactID;
                     cRActivity.BAccountID = baseGraph.Contact.Current.BAccountID;
                     cRActivity.StartDate = parsedDateTime;
+                    cRActivity.RefNoteID = baseGraph.Contact.Current.NoteID;
 
                     ext.UsrMailchimpAction = textInfo.ToTitleCase(activity.Action.ToLower());
                     ext.UsrMailchimpCampaignID = activity.CampaignId;
