@@ -1,0 +1,53 @@
+﻿<Graph ClassName="MailchimpCRActivityMaint" Source="#CDATA" IsNew="True" FileType="ExistingGraph">
+    <CDATA name="Source"><![CDATA[using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
+using System.Linq;
+using PX.Common;
+using PX.CS;
+using PX.Data.EP;
+using PX.Objects.CR;
+using PX.Data;
+using System;
+using System.Diagnostics;
+using System.Collections;
+using PX.Objects.GL;
+using PX.Objects.PM;
+using PX.Objects.CS;
+using PX.Objects;
+using PX.Objects.EP;
+
+namespace Mailchimp
+{
+  public class CRActivityMaint_Extension : PXGraphExtension<CRActivityMaint>
+  {
+        #region Event Handlers
+
+        protected virtual void CRActivity_RowSelected(PXCache sender, PXRowSelectedEventArgs e)
+        {
+            CRActivity row = e.Row as CRActivity;
+
+            if (row == null) return;
+
+            CRActivity activity = PXSelect<CRActivity, 
+                Where<CRActivity.noteID, Equal<Required<CRActivity.noteID>>>>.Select(Base, row.NoteID);
+
+            EPActivityType activityType = PXSelect<EPActivityType,
+               Where<EPActivityType.type, Equal<Required<EPActivityType.type>>>>.Select(Base, row.Type);
+
+            EPActivityType mCType = PXSelect<EPActivityType,
+                Where<EPActivityType.type, Equal<Required<EPActivityType.type>>>>.Select(Base, "MC"); // If doesn't exist, will just return null
+
+            // Mailchimp activities cannot be deleted and subject, type and date cannot be edited
+            if (activity != null && activityType == mCType)
+            {
+                PXUIFieldAttribute.SetEnabled<CRActivity.subject>(sender, row, false);
+                PXUIFieldAttribute.SetEnabled<CRActivity.startDate>(sender, row, false);
+                PXUIFieldAttribute.SetEnabled<CRActivity.type>(sender, row, false);
+                Base.Delete.SetEnabled(false);
+            }
+
+        }
+        #endregion
+    }
+}]]></CDATA>
+</Graph>
