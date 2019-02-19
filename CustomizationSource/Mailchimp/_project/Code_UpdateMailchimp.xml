@@ -15,6 +15,12 @@ namespace Mailchimp
         public PXFilter<ContactMailchimpProcessFilter> ProcessFilter;
         //public PXFilter<DetailsTable> DetailsView;
 
+        public static class UpdateMailchimpActions
+        {
+            public const string Status = "S";
+            public const string Activity = "A";
+            public const string List = "L";
+        }
         [Serializable]
         public class ContactMailchimpProcessFilter : IBqlTable
         {
@@ -23,7 +29,12 @@ namespace Mailchimp
             {
             }
             protected string _Action;
-            [PXAutomationMenu]
+            [PXString(2)]
+            [PXStringList(
+                new[] { UpdateMailchimpActions.Status, UpdateMailchimpActions.Activity, UpdateMailchimpActions.List },
+                new[] { "Update Status", "Update Activity", "Sync Lists" }
+            )]
+            [PXUnboundDefault(UpdateMailchimpActions.Status)]
             public virtual string Action
             {
                 get
