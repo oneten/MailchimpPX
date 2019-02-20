@@ -35,7 +35,7 @@ namespace Mailchimp
                Where<EPActivityType.type, Equal<Required<EPActivityType.type>>>>.Select(Base, row.Type);
 
             EPActivityType mCType = PXSelect<EPActivityType,
-                Where<EPActivityType.type, Equal<Required<EPActivityType.type>>>>.Select(Base, "MC"); // If doesn't exist, will just return null
+                Where<EPActivityType.type, Equal<Required<EPActivityType.type>>>>.Select(Base, MailchimpActivityType.MC); // If doesn't exist, will just return null
 
             // Mailchimp activities cannot be deleted and subject, type and date cannot be edited
             if (activity != null && activityType == mCType)
@@ -47,6 +47,7 @@ namespace Mailchimp
             }
 
         }
+               
         #endregion
     }
 }]]></CDATA>

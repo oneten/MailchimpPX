@@ -139,7 +139,7 @@ namespace Mailchimp
             CRActivitySetupMaint graph = PXGraph.CreateInstance<CRActivitySetupMaint>();
 
             EPActivityType existingType = PXSelect<EPActivityType,
-                Where<EPActivityType.type, Equal <Required<EPActivityType.type>>>>.Select(Base, "MC");
+                Where<EPActivityType.type, Equal <Required<EPActivityType.type>>>>.Select(Base, MailchimpActivityType.MC);
 
             if (existingType != null)
             {
@@ -147,7 +147,7 @@ namespace Mailchimp
             }
             else
             {
-                mailChimpActivityType.Type = "MC";
+                mailChimpActivityType.Type = MailchimpActivityType.MC;
                 mailChimpActivityType.Description = "Mailchimp";
                 mailChimpActivityType.Active = true;
                 mailChimpActivityType.ImageUrl = "main@Activity";
