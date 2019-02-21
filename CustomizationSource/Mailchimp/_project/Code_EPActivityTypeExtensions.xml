@@ -1,0 +1,29 @@
+﻿<Graph ClassName="EPActivityTypeExtensions" Source="#CDATA" IsNew="True" FileType="NewFile">
+    <CDATA name="Source"><![CDATA[using PX.Data.EP;
+using PX.Data;
+using PX.Objects.CR;
+using PX.Objects.EP;
+using PX.Objects;
+using PX.SM;
+using System.Collections.Generic;
+using System;
+
+namespace Mailchimp
+{
+        
+    [PXNonInstantiatedExtension]
+	public class EP_EPActivityType_ExistingColumn : PXCacheExtension<PX.Objects.EP.EPActivityType>
+	{
+        #region Application	
+        [PXMergeAttributes(Method = MergeMethod.Merge)]
+        [PXRemoveBaseAttribute(typeof(PX.Objects.CR.PXActivityApplicationAttribute))]
+        [ActivityTypesApplicationAttribute]
+        [PXDBCalced(typeof(Switch<Case<Where<EPActivityType.type, Equal<MailchimpActivityType.mailchimpType>>, ActivityTypesApplicationAttribute.integration>,
+            Switch<Case<Where<EPActivityType.isInternal, Equal<False>>, ActivityTypesApplicationAttribute.portal>, ActivityTypesApplicationAttribute.backend>>),
+            typeof(int))]
+        public int? Application { get; set; }
+        #endregion
+
+    }
+}]]></CDATA>
+</Graph>
