@@ -31,22 +31,6 @@ namespace Mailchimp
             {
                 // Sort Activities by StartDate (default is CreatedDateTime) so that Mailchimp Activities show up in sequence with pre-existing Acumatica Activites
                 Base.Activities.OrderByNew<OrderBy<Desc<CRActivity.startDate>>>();
-
-                // Hide "Add Mailchimp" from the "Add Activity" dropdown - // This has the desired effect but isn't an ideal solution - we'd have to repeat this on a lot of graphs
-               /* if (Base.Actions.Contains("NewActivity"))
-                {
-                    PXButtonState actionsMenuState = Base.Actions["NewActivity"].GetState(null) as PXButtonState;
-                    if (actionsMenuState != null)
-                    {
-                        foreach (ButtonMenu button in actionsMenuState.Menus)
-                        {
-                            if (button.Text == "Add Mailchimp")
-                            {
-                                button.Visible = false;
-                            }  
-                        }
-                    }
-                }*/
             }
         }
 
