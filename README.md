@@ -49,6 +49,17 @@ See your Mailchimp data right alongside your Acumatica data! No more wondering a
 1) Pull Mailchimp Lists into Acumatica
 
 2) Automatically designate Acumatica contacts as being on Mailchimp lists
+      - Navigate to the Update Mailchimp Data screen
+      - Select appropriate action ____
+      - Select list that you wish to pull contacts from
+      - Matches based on email address field
+      - TODO: address duplicates (in Mailchimp and Acumatica)
+      - TODO: what if API is unavailable
+      - TODO: what if contact has been removed from list
+      - TODO: what if list has been removed from Mailchimp
+      - *Notes:*
+         - *This process can be scheduled*
+         - *This should be run before contact list status is updated or activities are pulled in from Mailchimp*
 3) Update contact list status (subscribed, unsubscribed, cleaned)
 4) Pull latest Mailchimp Activity into Acumatica Contact Activities
 
