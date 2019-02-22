@@ -1,0 +1,37 @@
+﻿<Graph ClassName="MailchimpVendorMaint" Source="#CDATA" IsNew="True" FileType="ExistingGraph">
+    <CDATA name="Source"><![CDATA[using System;
+using System.Collections.Generic;
+using System.Collections;
+using System.Globalization;
+using System.Linq;
+using PX.Data;
+using PX.Objects.CS;
+using PX.Objects.CA;
+using PX.Objects.CR;
+using PX.Objects.CM;
+using PX.Objects.Common;
+using PX.Objects.GL;
+using PX.Objects.PO;
+using PX.Objects.TX;
+using PX.SM;
+using Branch = PX.SM.Branch;
+using PX.Objects;
+using PX.Objects.AP;
+
+namespace Mailchimp
+{
+  public class VendorMaint_Extension : PXGraphExtension<VendorMaint>
+  {
+  
+        public override void Initialize()
+        {
+            // Sort by StartDate (default is CreatedDateTime) so Mailchimp Activities are in sequence with pre-existing Acumatica Activites
+            Base.Activities.OrderByNew<OrderBy<Desc<CRActivity.startDate>>>(); 
+        }
+          
+    #region Event Handlers
+
+    #endregion
+  }
+}]]></CDATA>
+</Graph>

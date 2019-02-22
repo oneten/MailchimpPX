@@ -25,13 +25,10 @@ namespace Mailchimp
 
         public PXSelect<CRSetup> Setup;
 
-        public class ContactMaintPXExt : PXGraphExtension<ContactMaint>
+        public override void Initialize()
         {
-            public override void Initialize()
-            {
-                // Sort Activities by StartDate (default is CreatedDateTime) so that Mailchimp Activities show up in sequence with pre-existing Acumatica Activites
-                Base.Activities.OrderByNew<OrderBy<Desc<CRActivity.startDate>>>();
-            }
+            // Sort by StartDate (default is CreatedDateTime) so Mailchimp Activities are in sequence with pre-existing Acumatica Activites
+            Base.Activities.OrderByNew<OrderBy<Desc<CRActivity.startDate>>>(); 
         }
 
         public void getMailchimpStatus(Contact contact)
