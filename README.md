@@ -6,6 +6,11 @@ See your Mailchimp data right alongside your Acumatica data! No more wondering a
 
 ## Features
 
+1) Pull Mailchimp Lists into Acumatica
+2) Automatically designate Acumatica contacts as being on Mailchimp lists
+3) Update contact list status (subscribed, unsubscribed, cleaned)
+4) Pull latest Mailchimp Activity into Acumatica Contact Activities
+
 ## Installation & Setup
 
 ### Get customization project
@@ -26,5 +31,24 @@ See your Mailchimp data right alongside your Acumatica data! No more wondering a
      - In Acumatica, navigate to the Customer Management Preferences screen (ScreenId=CR101000)
      - On the bottom right of the General Settings tab, you'll find a Mailchimp Settings section
      - Enter your API key into the "Mailchimp API Key" field and save
-
+  
+### Configure workspaces and schedules
+1) Add the following screens to a workspace (we recommend the Marketing workspace or whatever workspace you use for Contacts)
+   - Mailchimp Lists (ScreenId=CR281000)
+   - Update Mailchimp Data (ScreenId=CR581000)
+ 2) Schedule the following processes (this step is optional - you could choose to run these manually if you prefer). For most uses, updated nightly would be sufficient but the frequency is up to the discretion of the user. Use the Update Mailchimp Data screen to schedule the following:
+      - Get lists
+      - Update who's subscribed
+      - Update subscription status
+      - Pull in Mailchimp Activities
+   
 ## Further Explanation
+
+**A Note About Duplicates**: In Acumatica, a contact can only be associated with a single Mailchimp list. In Mailchimp, contacts only exist in the context of a list. In other words, if the same email address is subscribed to multiple lists, Mailchimp treats those contacts as two separate subscribers. Mailchimp [recommends using a single master list](https://mailchimp.com/help/requirements-and-best-practices-for-lists/) and using groups and segments to organize that list rather than maintaining multiple lists. However, if for some reason, you have multiple lists in Mailchimp that are synced to Acumatica, be aware that if you have duplicate email addresses in those lists, Acumatica will only be able to connect that contact to one of those lists.
+
+1) Pull Mailchimp Lists into Acumatica
+
+2) Automatically designate Acumatica contacts as being on Mailchimp lists
+3) Update contact list status (subscribed, unsubscribed, cleaned)
+4) Pull latest Mailchimp Activity into Acumatica Contact Activities
+
