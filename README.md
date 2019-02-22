@@ -52,3 +52,10 @@ See your Mailchimp data right alongside your Acumatica data! No more wondering a
 3) Update contact list status (subscribed, unsubscribed, cleaned)
 4) Pull latest Mailchimp Activity into Acumatica Contact Activities
 
+![Contact Activities Tab displays Mailchimp-driven activities along with Acumatica-driven Activities](/Screenshots/Contact%20Activity%20Tab.PNG?raw=true "Contact Activities Tab")
+
+![Contact Details Tab includes a Mailchimp section which shows the Mailchimp list the contact is subscribed to as well as the subscription status](/Screenshots/Contact%20Details%20Tab.PNG?raw=true "Contact Details Tab")
+
+![The Integration Adds a new Activity Type "MC" for Mailchimp Activities](/Screenshots/Mailchimp%20Activity%20Type.PNG?raw=true "Activity Types")
+
+
