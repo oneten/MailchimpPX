@@ -1,5 +1,6 @@
 ﻿<Graph ClassName="UpdateMailchimp" Source="#CDATA" IsNew="True" FileType="NewGraph">
     <CDATA name="Source"><![CDATA[using System;
+using System.Collections;
 using System.Collections.Generic;
 using PX.Data;
 using PX.Objects.CR;
@@ -9,10 +10,10 @@ namespace Mailchimp
   public class UpdateMailchimp : PXGraph<UpdateMailchimp>
   {
         //public PXSave<Contact> Save;
-        public PXCancel<Contact> Cancel;
-        public PXProcessing<Contact, Where<ContactExt.usrMailchimpListID, IsNotNull>> Contacts;
-
+        public PXCancel<ContactMailchimpProcessFilter> Cancel;
         public PXFilter<ContactMailchimpProcessFilter> ProcessFilter;
+        public PXProcessing<Contact> Contacts;
+
         //public PXFilter<DetailsTable> DetailsView;
 
         public static class UpdateMailchimpActions
@@ -55,6 +56,26 @@ namespace Mailchimp
 
          }*/
 
+        public virtual IEnumerable contacts()
+        {
+            string actionID = ProcessFilter.Current.Action;
+            IEnumerable newView;
+            switch (actionID)
+            {
+                case UpdateMailchimpActions.List:
+                    newView = PXSelect<Contact>.Select(this);
+                    break;
+                case UpdateMailchimpActions.Status:
+                case UpdateMailchimpActions.Activity:
+                default:
+                    newView = PXSelect<Contact, Where<ContactExt.usrMailchimpListID, IsNotNull>>.Select(this);
+                    break;
+                
+
+            }
+            return newView;
+        }
+
         public static void Process(List<Contact> contacts)
         {
             var graph = PXGraph.CreateInstance<ContactMaint>();
@@ -64,8 +85,6 @@ namespace Mailchimp
             ContactMaint_Extension graphExt = graph.GetExtension<ContactMaint_Extension>();
             
             var manager = graphExt.GetManager();
-            
-            // TODO Update the Mailchimp Lists table first
             
             foreach (var contact in contacts)
             {
@@ -93,6 +112,14 @@ namespace Mailchimp
         public UpdateMailchimp()
         {
             Contacts.SetProcessDelegate(Process);
+        }
+
+        public override bool IsDirty
+        {
+            get
+            {
+                return false;
+            }
         }
     }
 }]]></CDATA>

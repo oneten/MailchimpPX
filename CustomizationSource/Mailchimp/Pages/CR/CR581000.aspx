@@ -15,7 +15,7 @@
 	<px:PXFormView ID="form" runat="server" DataSourceID="ds" DataMember="ProcessFilter" Width="100%" Height="100px" AllowAutoHide="false">
 		<Template>
 			<px:PXLayoutRule ID="PXLayoutRule1" runat="server" StartRow="True"></px:PXLayoutRule>
-			<px:PXDropDown runat="server" ID="CstPXDropDown1" DataField="Action" /></Template>
+			<px:PXDropDown CommitChanges="True" runat="server" ID="CstPXDropDown1" DataField="Action" ></px:PXDropDown></Template>
 	</px:PXFormView>
 </asp:Content>
 <asp:Content ID="cont3" ContentPlaceHolderID="phG" Runat="Server">
