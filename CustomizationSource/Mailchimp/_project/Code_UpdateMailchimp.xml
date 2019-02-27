@@ -80,20 +80,13 @@ namespace Mailchimp
         {
             var graph = PXGraph.CreateInstance<ContactMaint>();
             bool errorOccurred = false;
-            
-            ContactExt ext;
             ContactMaint_Extension graphExt = graph.GetExtension<ContactMaint_Extension>();
-            
-            var manager = graphExt.GetManager();
-            
+
             foreach (var contact in contacts)
             {
                 try
                 {
-                    ext = contact.GetExtension<ContactExt>();
-                    var member = manager.GetMember(ext.UsrMailchimpListID, contact.EMail);
-
-                    graphExt.SetMailchimpStatus(contact, member.Status.ToString());
+                    graphExt.UpdateMailchimpStatus(contact);
 
                     PXProcessing.SetInfo(String.Format(
                         "Contact {0} has been updated.",

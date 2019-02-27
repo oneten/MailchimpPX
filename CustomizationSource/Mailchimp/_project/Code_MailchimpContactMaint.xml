@@ -17,6 +17,7 @@ using PX.SM;
 using PX.Objects;
 using PX.Objects.CR;
 using MailchimpPXLib;
+using MC = MailChimp.Net.Models;
 
 namespace Mailchimp
 {
@@ -31,7 +32,7 @@ namespace Mailchimp
             Base.Activities.OrderByNew<OrderBy<Desc<CRActivity.startDate>>>(); 
         }
 
-        public void getMailchimpStatus(Contact contact)
+        public void UpdateMailchimpStatus(Contact contact)
         {
             Base.ContactCurrent.Current = contact;
             ContactExt ext = contact.GetExtension<ContactExt>();
@@ -39,15 +40,7 @@ namespace Mailchimp
             var manager = GetManager();
             var member = manager.GetMember(ext.UsrMailchimpListID, contact.EMail);
 
-            SetMailchimpStatus(contact, member.Status.ToString());
-        }
-
-        public void SetMailchimpStatus(Contact contact, string status)
-        {
-            Base.Contact.Current = contact;
-            ContactExt ext = contact.GetExtension<ContactExt>();
-
-            ext.UsrMailchimpListStatus = status;
+            ext.UsrMailchimpListStatus = member.Status.ToString();
             Base.ContactCurrent.Update(contact);
             Base.Save.Press();
         }
@@ -63,10 +56,10 @@ namespace Mailchimp
         }
 
         
-        public PXAction<Contact> SyncMailchimpStatus;
+        public PXAction<Contact> syncMailchimpStatus;
         [PXProcessButton]
         [PXUIField(DisplayName = "Sync Mailchimp")]
-        protected virtual IEnumerable syncMailchimpStatus(PXAdapter adapter)
+        protected virtual IEnumerable SyncMailchimpStatus(PXAdapter adapter)
         {
             foreach (Contact contact in adapter.Get())
             {
@@ -76,7 +69,7 @@ namespace Mailchimp
                 {
                     ContactMaint graph = PXGraph.CreateInstance<ContactMaint>();
                     ContactMaint_Extension graphExt = graph.GetExtension<ContactMaint_Extension>();
-                    graphExt.getMailchimpStatus(contact);
+                    graphExt.UpdateMailchimpStatus(contact);
                 });
 
                 yield return contact;
@@ -85,24 +78,20 @@ namespace Mailchimp
 
         #region Get Mailchimp Activities
 
-        List<MailChimp.Net.Models.Activity> activityList = new List<MailChimp.Net.Models.Activity>();
+        List<MC.Activity> activityList = new List<MC.Activity>();
 
-        public PXAction<PX.Objects.CR.Contact> SyncMailchimpActivities;
+        public PXAction<Contact> syncMailchimpActivities;
         [PXButton(CommitChanges = true)]
         [PXUIField(DisplayName = "Sync MC Activities")]
-        protected void syncMailchimpActivities()
+        protected void SyncMailchimpActivities()
         {
 
             Contact contact = Base.Contact.Current;
             ContactExt ext = contact.GetExtension<ContactExt>();
 
-            CRSetup setup = Base.Setup.Current;
-            CRSetupExt setupExt = setup.GetExtension<CRSetupExt>();
+            var manager = GetManager();
 
-            var apiKey = setupExt.UsrMailchimpAPIKey;
-            var manager = new MailchimpPXManager(apiKey);
-
-            EPActivityType activityType = getOrCreateMailchimpActivityType();
+            EPActivityType activityType = GetOrCreateMailchimpActivityType();
 
             // TODO - make sure the contact is on a mailchimp list before trying to get activities
 
@@ -116,8 +105,7 @@ namespace Mailchimp
                     var activities = manager.GetActivities(list.ListID, Base.Contact.Current.EMail);
                     if (activities != null)
                     {
-                        CRActivityMaint graph = PXGraph.CreateInstance<CRActivityMaint>();
-                        registerActivities(activities.ToList(), activityType, graph, Base);
+                        RegisterActivities(activities.ToList(), activityType);
                     }
 
                 });
@@ -125,12 +113,11 @@ namespace Mailchimp
             }
             catch (Exception ex)
             {
-                string err = ex.InnerException.ToString();
-                throw ex;
+                throw ex.InnerException;
             }
         }
 
-        private EPActivityType getOrCreateMailchimpActivityType()
+        private EPActivityType GetOrCreateMailchimpActivityType()
         {
             EPActivityType mailChimpActivityType = new EPActivityType();
             CRActivitySetupMaint graph = PXGraph.CreateInstance<CRActivitySetupMaint>();
@@ -160,11 +147,11 @@ namespace Mailchimp
             return mailChimpActivityType;
         }
 
-        public bool activityExist(MailChimp.Net.Models.Activity activity, ContactMaint baseGraph)
+        public bool ActivityExists(MC.Activity activity)
         {
             // TODO - do we want to change this to just say get everything greater than the latest timestamp? 
             // Maybe more efficient. But there is the potential for someone to delete mailchimp activities after they are pulled into Acumatica, so maybe a full check is good?
-            foreach (CRActivity acumaticaActivity in baseGraph.Activities.Select())
+            foreach (CRActivity acumaticaActivity in Base.Activities.Select())
             {
                 CRActivityExt acumaticaActivityExt = acumaticaActivity.GetExtension<CRActivityExt>(); // TODO - only compare against mailchimp activities
 
@@ -174,17 +161,18 @@ namespace Mailchimp
             return false;
         }
 
-        public void registerActivities(List<MailChimp.Net.Models.Activity> result, EPActivityType activityType, CRActivityMaint graph, ContactMaint baseGraph)
+        public void RegisterActivities(List<MC.Activity> result, EPActivityType activityType)
         {
             bool isInserted = false;
+            CRActivityMaint graph = PXGraph.CreateInstance<CRActivityMaint>();
 
             // Insert activities in order from earliest to latest so that more recent activities are shown at the top of the Activities tab for the contact
             result = result.OrderBy(n => n.Timestamp).ToList();
 
-            foreach (MailChimp.Net.Models.Activity activity in result)
+            foreach (MC.Activity activity in result)
             {
                  //Check if it already exist by UsrMCTimestamp
-                if (!activityExist(activity, baseGraph))
+                if (!ActivityExists(activity))
                 {
                     //Insert Activity to Acumatica
                     CRActivity cRActivity = new CRActivity();
@@ -194,11 +182,11 @@ namespace Mailchimp
                     DateTime parsedDateTime = DateTime.ParseExact(activity.Timestamp, "yyyy-MM-ddTHH:mm:sszzzz", CultureInfo.InvariantCulture);
 
                     cRActivity.Type = activityType.Type;
-                    cRActivity.Subject = createActivitySubject(activity.Action, activity.Title);  
-                    cRActivity.ContactID = baseGraph.Contact.Current.ContactID;
-                    cRActivity.BAccountID = baseGraph.Contact.Current.BAccountID;
+                    cRActivity.Subject = CreateActivitySubject(activity.Action, activity.Title);  
+                    cRActivity.ContactID = Base.Contact.Current.ContactID;
+                    cRActivity.BAccountID = Base.Contact.Current.BAccountID;
                     cRActivity.StartDate = parsedDateTime;
-                    cRActivity.RefNoteID = baseGraph.Contact.Current.NoteID;
+                    cRActivity.RefNoteID = Base.Contact.Current.NoteID;
 
                     ext.UsrMailchimpAction = textInfo.ToTitleCase(activity.Action.ToLower());
                     ext.UsrMailchimpCampaignID = activity.CampaignId;
@@ -214,7 +202,7 @@ namespace Mailchimp
                 graph.Actions.PressSave();
         }
 
-        private string createActivitySubject(string action, string title) 
+        private string CreateActivitySubject(string action, string title) 
         {
             action = mailChimpActionDict.ContainsKey(action) ? mailChimpActionDict[action] : action;
             string subject = action + title;
@@ -222,7 +210,7 @@ namespace Mailchimp
             return subject;
         }
 
-        IDictionary<string, string> mailChimpActionDict = new Dictionary<string, string>()
+        private readonly Dictionary<string, string> mailChimpActionDict = new Dictionary<string, string>()
         {
             {"sent", "Was Sent the email " },
             {"open", "Opened the email " },
