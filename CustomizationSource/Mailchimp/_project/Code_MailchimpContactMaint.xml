@@ -80,40 +80,69 @@ namespace Mailchimp
 
         List<MC.Activity> activityList = new List<MC.Activity>();
 
-        public PXAction<Contact> syncMailchimpActivities;
-        [PXButton(CommitChanges = true)]
-        [PXUIField(DisplayName = "Sync MC Activities")]
-        protected void SyncMailchimpActivities()
+        public void UpdateMailchimpActivities(Contact contact)
         {
-
-            Contact contact = Base.Contact.Current;
+            Base.ContactCurrent.Current = contact;
             ContactExt ext = contact.GetExtension<ContactExt>();
 
             var manager = GetManager();
-
             EPActivityType activityType = GetOrCreateMailchimpActivityType();
 
             // TODO - make sure the contact is on a mailchimp list before trying to get activities
+            // TODO - do I need to make sure the contact is no null before doing anything?
 
             try
             {
-                PXLongOperation.StartOperation(Base, delegate
+                CRMailchimpList list = PXSelect<CRMailchimpList,
+                    Where<CRMailchimpList.listID, Equal<Required<CRMailchimpList.listID>>>>.Select(Base, ext.UsrMailchimpListID);
+
+                var activities = manager.GetActivities(list.ListID, Base.Contact.Current.EMail);
+                if (activities != null)
                 {
-                    CRMailchimpList list = PXSelect<CRMailchimpList, 
-                        Where<CRMailchimpList.listID, Equal<Required<CRMailchimpList.listID>>>>.Select(Base, ext.UsrMailchimpListID);
-
-                    var activities = manager.GetActivities(list.ListID, Base.Contact.Current.EMail);
-                    if (activities != null)
-                    {
-                        RegisterActivities(activities.ToList(), activityType);
-                    }
-
-                });
+                    RegisterActivities(activities.ToList(), activityType);
+                }
 
             }
             catch (Exception ex)
             {
                 throw ex.InnerException;
+            }
+
+          Base.ContactCurrent.Update(contact);
+            Base.Save.Press();
+        }
+
+        public PXAction<Contact> syncMailchimpActivities;
+        [PXButton(CommitChanges = true)]
+        [PXUIField(DisplayName = "Sync MC Activities")]
+        protected virtual IEnumerable SyncMailchimpActivities(PXAdapter adapter)
+        {
+            foreach (Contact contact in adapter.Get())
+            {
+                this.Base.Actions.PressSave();
+
+                PXLongOperation.StartOperation(Base, delegate ()
+                {
+                    ContactMaint graph = PXGraph.CreateInstance<ContactMaint>();
+                    ContactMaint_Extension graphExt = graph.GetExtension<ContactMaint_Extension>();
+                    graphExt.UpdateMailchimpActivities(contact);
+                });
+
+                yield return contact;
+            }
+        }
+
+        // NB: This is a development tool that should be commented out before putting on production -- having the ability to delete and re-pull MC activities will help with testing/development
+        public PXAction<Contact> deleteMailchimpActivities;
+        [PXButton(CommitChanges = true)]
+        [PXUIField(DisplayName = "Delete MC Activities")]
+        protected void DeleteMailchimpActivities()
+        {
+            EPActivityType mCActivityType = GetOrCreateMailchimpActivityType(); 
+
+            foreach(CRPMTimeActivity acumaticaActivity in Base.Activities.Select().RowCast<CRPMTimeActivity>().Where(ac => ac.Type == mCActivityType.Type))
+            {
+                Base.Activities.Delete(acumaticaActivity);
             }
         }
 
@@ -141,7 +170,6 @@ namespace Mailchimp
 
                 graph.ActivityTypes.Insert(mailChimpActivityType);
                 graph.Actions.PressSave();
-
             }
 
             return mailChimpActivityType;
@@ -155,7 +183,9 @@ namespace Mailchimp
             {
                 CRActivityExt acumaticaActivityExt = acumaticaActivity.GetExtension<CRActivityExt>(); // TODO - only compare against mailchimp activities
 
-                if (activity.Timestamp == acumaticaActivityExt.UsrMailchimpTimestamp)
+                // TODO - the unsubscribe and subscribe activities are strange. They sort of show up in the feed but sort of not. Maybe we need to deal with those in a different way?
+
+                if (activity.Timestamp == acumaticaActivityExt.UsrMailchimpTimestamp) // TODO this breaks if the timestamp is null on the acumatica activity (which it might be on unubscribes?)
                     return true;
             }
             return false;
