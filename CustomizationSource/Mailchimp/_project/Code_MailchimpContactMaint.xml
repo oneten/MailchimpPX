@@ -108,7 +108,7 @@ namespace Mailchimp
                 throw ex.InnerException;
             }
 
-          Base.ContactCurrent.Update(contact);
+            Base.ContactCurrent.Update(contact);
             Base.Save.Press();
         }
 
@@ -175,20 +175,30 @@ namespace Mailchimp
             return mailChimpActivityType;
         }
 
+        // Check to see if the Mailchimp activity already exists
         public bool ActivityExists(MC.Activity activity)
         {
+            EPActivityType mCActivityType = GetOrCreateMailchimpActivityType();
+
+            TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
+            string titleCasedAction = textInfo.ToTitleCase(activity.Action.ToLower());
+
             // TODO - do we want to change this to just say get everything greater than the latest timestamp? 
             // Maybe more efficient. But there is the potential for someone to delete mailchimp activities after they are pulled into Acumatica, so maybe a full check is good?
-            foreach (CRActivity acumaticaActivity in Base.Activities.Select())
+            foreach (CRActivity acumaticaActivity in Base.Activities.Select()) 
             {
-                CRActivityExt acumaticaActivityExt = acumaticaActivity.GetExtension<CRActivityExt>(); // TODO - only compare against mailchimp activities
+                CRActivityExt acumaticaActivityExt = acumaticaActivity.GetExtension<CRActivityExt>();
 
+                // if it's a MailChimp type activity and the timestamp and action match, assume it's the same activity and has already been pulled into Acumatica
+                if (acumaticaActivity.Type == mCActivityType.Type && activity.Timestamp == acumaticaActivityExt.UsrMailchimpTimestamp && titleCasedAction == acumaticaActivityExt.UsrMailchimpAction)
+                    return true; // activity already exists in Acumatica
+
+                // TODO this breaks if the timestamp is null on the acumatica activity (which it might be on unubscribes?)
                 // TODO - the unsubscribe and subscribe activities are strange. They sort of show up in the feed but sort of not. Maybe we need to deal with those in a different way?
 
-                if (activity.Timestamp == acumaticaActivityExt.UsrMailchimpTimestamp) // TODO this breaks if the timestamp is null on the acumatica activity (which it might be on unubscribes?)
-                    return true;
             }
-            return false;
+
+            return false; // activity doesn't exist in Acumatica
         }
 
         public void RegisterActivities(List<MC.Activity> result, EPActivityType activityType)
