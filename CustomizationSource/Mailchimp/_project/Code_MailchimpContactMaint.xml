@@ -85,11 +85,35 @@ namespace Mailchimp
             Base.ContactCurrent.Current = contact;
             ContactExt ext = contact.GetExtension<ContactExt>();
 
-            var manager = GetManager();
-            EPActivityType activityType = GetOrCreateMailchimpActivityType();
-
             // TODO - make sure the contact is on a mailchimp list before trying to get activities
-            // TODO - do I need to make sure the contact is no null before doing anything?
+            // TODO - do I need to make sure the contact is not null before doing anything?
+
+            var manager = GetManager();
+
+            EPActivityType mCActivityType = GetOrCreateMailchimpActivityType();
+
+            // 1. Figure out the date of the most recent MC activity in Acumatica for this contact
+            IEnumerable<CRPMTimeActivity> mCActivitesInAcumatica = Base.Activities.Select().RowCast<CRPMTimeActivity>()
+                 .Where(ac => ac.Type == mCActivityType.Type)
+                 .OrderBy(ac => ac.StartDate); // for mailchimp activities, the start date is pulled from the mailchimp timestamp
+
+            DateTime? mostRecentMCDateInAC = mCActivitesInAcumatica.Last().StartDate;
+
+           /* PXResultset<CRActivity> myActivites = PXSelectOrderBy<CRActivity, OrderBy<Asc<CRActivityExt.usrMailchimpTimestamp>>>.Select(Base); //<CRActivityExt.usrMailchimpTimestamp >>;
+            Debug.WriteLine(myActivites);
+            //FIXME - this is all activities in the whole system and it should only be activities for this contact
+
+            PXResultset<CRActivity> theseActivities = Base.Activities.Search<CRActivity.type, Equal<>
+
+            foreach (CRActivity r in myActivites) {
+                Debug.WriteLine(r.Subject);
+            }*/
+
+
+           
+            // 2. Pull any activities from MC that are since that date (or pull them all and only insert them if they are since that date?)
+
+
 
             try
             {
@@ -99,7 +123,7 @@ namespace Mailchimp
                 var activities = manager.GetActivities(list.ListID, Base.Contact.Current.EMail);
                 if (activities != null)
                 {
-                    RegisterActivities(activities.ToList(), activityType);
+                    RegisterActivities(activities.ToList(), mCActivityType);
                 }
 
             }
@@ -185,6 +209,9 @@ namespace Mailchimp
 
             // TODO - do we want to change this to just say get everything greater than the latest timestamp? 
             // Maybe more efficient. But there is the potential for someone to delete mailchimp activities after they are pulled into Acumatica, so maybe a full check is good?
+
+            // Sort MC activities in Acumatica to find the most recent MC activity brought into Acumatica. If the activity is more recent than that, bring it in
+
             foreach (CRActivity acumaticaActivity in Base.Activities.Select()) 
             {
                 CRActivityExt acumaticaActivityExt = acumaticaActivity.GetExtension<CRActivityExt>();
