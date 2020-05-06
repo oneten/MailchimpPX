@@ -35,6 +35,7 @@ namespace Mailchimp
         public void UpdateMailchimpStatus(Contact contact)
         {
             Base.ContactCurrent.Current = contact;
+            if (contact == null) return;
             ContactExt ext = contact.GetExtension<ContactExt>();
 
             var manager = GetManager();
@@ -83,10 +84,10 @@ namespace Mailchimp
         public void UpdateMailchimpActivities(Contact contact)
         {
             Base.ContactCurrent.Current = contact;
+            if (contact == null) return;
             ContactExt ext = contact.GetExtension<ContactExt>();
 
             // TODO - make sure the contact is on a mailchimp list before trying to get activities
-            // TODO - do I need to make sure the contact is not null before doing anything?
 
             var manager = GetManager();
 
@@ -98,18 +99,6 @@ namespace Mailchimp
                  .OrderBy(ac => ac.StartDate); // for mailchimp activities, the start date is pulled from the mailchimp timestamp
 
             DateTime? mostRecentMCDateInAC = mCActivitesInAcumatica.Last().StartDate;
-
-           /* PXResultset<CRActivity> myActivites = PXSelectOrderBy<CRActivity, OrderBy<Asc<CRActivityExt.usrMailchimpTimestamp>>>.Select(Base); //<CRActivityExt.usrMailchimpTimestamp >>;
-            Debug.WriteLine(myActivites);
-            //FIXME - this is all activities in the whole system and it should only be activities for this contact
-
-            PXResultset<CRActivity> theseActivities = Base.Activities.Search<CRActivity.type, Equal<>
-
-            foreach (CRActivity r in myActivites) {
-                Debug.WriteLine(r.Subject);
-            }*/
-
-
            
             // 2. Pull any activities from MC that are since that date (or pull them all and only insert them if they are since that date?)
 
