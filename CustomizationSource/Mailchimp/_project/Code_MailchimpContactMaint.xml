@@ -41,6 +41,9 @@ namespace Mailchimp
             var manager = GetManager();
             var member = manager.GetMember(ext.UsrMailchimpListID, contact.EMail);
 
+
+            // TODO - see if we can pull subscribed / unsunscribed info(date, reason, by whom) onto the contact itself
+
             ext.UsrMailchimpListStatus = member.Status.ToString();
             Base.ContactCurrent.Update(contact);
             Base.Save.Press();
@@ -77,6 +80,58 @@ namespace Mailchimp
             }
         }
 
+        public PXAction<Contact> actionListMembership;
+        [PXProcessButton]
+        [PXUIField(DisplayName = "Get List Membership")]
+        protected virtual IEnumerable ActionListMembership(PXAdapter adapter)
+        {
+            foreach (Contact contact in adapter.Get())
+            {
+                this.Base.Actions.PressSave();
+
+                PXLongOperation.StartOperation(Base, delegate ()
+                {
+                    ContactMaint graph = PXGraph.CreateInstance<ContactMaint>();
+                    ContactMaint_Extension graphExt = graph.GetExtension<ContactMaint_Extension>();
+                    graphExt.GetListMembership(contact);
+                });
+
+                yield return contact;
+            }
+        }
+
+        public void GetListMembership(Contact contact)
+        {
+
+            Base.ContactCurrent.Current = contact;
+            if (contact == null) return;
+            ContactExt ext = contact.GetExtension<ContactExt>();
+
+            var manager = GetManager();
+
+            foreach (var mailchimpList in manager.GetLists())
+            {
+                // see if the contact is on that list
+                // if yes: save list on contact, then break (don't worry about checking the other lists if you've already found a match)
+                try
+                {
+                    manager.GetMember(mailchimpList.Id, contact.EMail);
+                    ext.UsrMailchimpListID = mailchimpList.Id;
+                    break;
+                } catch (MemberDoesNotExistException)
+                {
+                    // if the user doesn't exist on a MC list, don't throw an exception. Just continue/try the next list. 
+                }
+            }
+
+            // TODO: Do you want to tell the user if the member is not on any mailchimp list? You don't really want an error, since it's not an error just a fact.
+
+            // TODO: Does our code account for things like the API being down vs a contact just not being on a list?
+
+            Base.ContactCurrent.Update(contact);
+            Base.Save.Press();
+        }
+
         #region Get Mailchimp Activities
 
         List<MC.Activity> activityList = new List<MC.Activity>();
@@ -85,7 +140,13 @@ namespace Mailchimp
         {
             Base.ContactCurrent.Current = contact;
             if (contact == null) return;
+
             ContactExt ext = contact.GetExtension<ContactExt>();
+
+            if (ext.UsrMailchimpListID == null)
+            {
+                // throw exception, or just go try to find the list
+            }
 
             // TODO - make sure the contact is on a mailchimp list before trying to get activities
 
@@ -93,15 +154,15 @@ namespace Mailchimp
 
             EPActivityType mCActivityType = GetOrCreateMailchimpActivityType();
 
+            // This code works but doesn't do us any good because the API can't handle dates 
             // 1. Figure out the date of the most recent MC activity in Acumatica for this contact
-            IEnumerable<CRPMTimeActivity> mCActivitesInAcumatica = Base.Activities.Select().RowCast<CRPMTimeActivity>()
+            /* IEnumerable<CRPMTimeActivity> mCActivitesInAcumatica = Base.Activities.Select().RowCast<CRPMTimeActivity>()
                  .Where(ac => ac.Type == mCActivityType.Type)
                  .OrderBy(ac => ac.StartDate); // for mailchimp activities, the start date is pulled from the mailchimp timestamp
-
-            DateTime? mostRecentMCDateInAC = mCActivitesInAcumatica.Last().StartDate;
-           
+            DateTime? mostRecentMCDateInAC = mCActivitesInAcumatica.Last().StartDate; */
             // 2. Pull any activities from MC that are since that date (or pull them all and only insert them if they are since that date?)
 
+            // TODO - looks like the API might limit to 50 activities. Do we need to test that? are we worried about that?
 
 
             try
@@ -109,7 +170,7 @@ namespace Mailchimp
                 CRMailchimpList list = PXSelect<CRMailchimpList,
                     Where<CRMailchimpList.listID, Equal<Required<CRMailchimpList.listID>>>>.Select(Base, ext.UsrMailchimpListID);
 
-                var activities = manager.GetActivities(list.ListID, Base.Contact.Current.EMail);
+                var activities = manager.GetActivities(list.ListID, Base.Contact.Current.EMail);             
                 if (activities != null)
                 {
                     RegisterActivities(activities.ToList(), mCActivityType);
@@ -196,22 +257,13 @@ namespace Mailchimp
             TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
             string titleCasedAction = textInfo.ToTitleCase(activity.Action.ToLower());
 
-            // TODO - do we want to change this to just say get everything greater than the latest timestamp? 
-            // Maybe more efficient. But there is the potential for someone to delete mailchimp activities after they are pulled into Acumatica, so maybe a full check is good?
-
-            // Sort MC activities in Acumatica to find the most recent MC activity brought into Acumatica. If the activity is more recent than that, bring it in
-
             foreach (CRActivity acumaticaActivity in Base.Activities.Select()) 
             {
                 CRActivityExt acumaticaActivityExt = acumaticaActivity.GetExtension<CRActivityExt>();
 
-                // if it's a MailChimp type activity and the timestamp and action match, assume it's the same activity and has already been pulled into Acumatica
+                // If it's a MailChimp type activity and the timestamp and action match, assume it's the same activity and has already been pulled into Acumatica
                 if (acumaticaActivity.Type == mCActivityType.Type && activity.Timestamp == acumaticaActivityExt.UsrMailchimpTimestamp && titleCasedAction == acumaticaActivityExt.UsrMailchimpAction)
                     return true; // activity already exists in Acumatica
-
-                // TODO this breaks if the timestamp is null on the acumatica activity (which it might be on unubscribes?)
-                // TODO - the unsubscribe and subscribe activities are strange. They sort of show up in the feed but sort of not. Maybe we need to deal with those in a different way?
-
             }
 
             return false; // activity doesn't exist in Acumatica
@@ -227,8 +279,11 @@ namespace Mailchimp
 
             foreach (MC.Activity activity in result)
             {
-                 //Check if it already exist by UsrMCTimestamp
-                if (!ActivityExists(activity))
+                if ( !(activity.Action == "Ubsub") && !ActivityExists(activity)) // Make sure it hasn't already been pulled into Acumatica
+                                                                                 // Exclude unsubscribe from the activities list since unsubscribes show up but subscribes don't
+                                                                                 // Also, if someone ubsubscribes and then resubscribes, the resubscribe doesn't show as an activity, so it's confusing
+                                                                                 // Moreover, ifthey unsubscribe a second time, the first ubsubscribe is no longer in the activity stream, which is also confusing
+
                 {
                     //Insert Activity to Acumatica
                     CRActivity cRActivity = new CRActivity();
