@@ -32,22 +32,6 @@ namespace Mailchimp
             Base.Activities.OrderByNew<OrderBy<Desc<CRActivity.startDate>>>(); 
         }
 
-        public void UpdateMailchimpStatus(Contact contact)
-        {
-            Base.ContactCurrent.Current = contact;
-            if (contact == null) return;
-            ContactExt ext = contact.GetExtension<ContactExt>();
-
-            var manager = GetManager();
-            var member = manager.GetMember(ext.UsrMailchimpListID, contact.EMail);
-
-
-            // TODO - see if we can pull subscribed / unsunscribed info(date, reason, by whom) onto the contact itself
-
-            ext.UsrMailchimpListStatus = member.Status.ToString();
-            Base.ContactCurrent.Update(contact);
-            Base.Save.Press();
-        }
 
         // Given a Contact maintenance page, return a Mailchimp manager
         public MailchimpPXManager GetManager()
@@ -59,11 +43,11 @@ namespace Mailchimp
             return new MailchimpPXManager(apiKey);
         }
 
-        
-        public PXAction<Contact> syncMailchimpStatus;
+        #region GetMailchimpData
+        public PXAction<Contact> actionGetMailchimpData;
         [PXProcessButton]
-        [PXUIField(DisplayName = "Sync Mailchimp")]
-        protected virtual IEnumerable SyncMailchimpStatus(PXAdapter adapter)
+        [PXUIField(DisplayName = "Get Mailchimp Data")]
+        protected virtual IEnumerable ActionGetMailchimpData(PXAdapter adapter)
         {
             foreach (Contact contact in adapter.Get())
             {
@@ -73,13 +57,33 @@ namespace Mailchimp
                 {
                     ContactMaint graph = PXGraph.CreateInstance<ContactMaint>();
                     ContactMaint_Extension graphExt = graph.GetExtension<ContactMaint_Extension>();
-                    graphExt.UpdateMailchimpStatus(contact);
+                    graphExt.GetMailchimpData(contact);
                 });
 
                 yield return contact;
             }
         }
 
+        public void GetMailchimpData(Contact contact)
+        {
+
+            Base.ContactCurrent.Current = contact;
+            if (contact == null) return;
+            ContactExt ext = contact.GetExtension<ContactExt>();
+
+            // 1. Get list
+            GetListMembership(contact);
+            // 2. Get subscription status
+            UpdateMailchimpStatus(contact);
+            // 3. Get activities
+            UpdateMailchimpActivities(contact);
+
+            Base.ContactCurrent.Update(contact);
+            Base.Save.Press();
+        }
+        #endregion
+
+        #region UpdateListMembership
         public PXAction<Contact> actionListMembership;
         [PXProcessButton]
         [PXUIField(DisplayName = "Get List Membership")]
@@ -100,6 +104,7 @@ namespace Mailchimp
             }
         }
 
+        // Check mailchimp to see if the contact is on a list and if so, update their MC list in Acumatica
         public void GetListMembership(Contact contact)
         {
 
@@ -118,7 +123,8 @@ namespace Mailchimp
                     manager.GetMember(mailchimpList.Id, contact.EMail);
                     ext.UsrMailchimpListID = mailchimpList.Id;
                     break;
-                } catch (MemberDoesNotExistException)
+                }
+                catch (MemberDoesNotExistException)
                 {
                     // if the user doesn't exist on a MC list, don't throw an exception. Just continue/try the next list. 
                 }
@@ -131,6 +137,48 @@ namespace Mailchimp
             Base.ContactCurrent.Update(contact);
             Base.Save.Press();
         }
+        #endregion
+
+        #region UpdateSubscriptionStatus 
+        public void UpdateMailchimpStatus(Contact contact)
+        {
+            Base.ContactCurrent.Current = contact;
+            if (contact == null) return;
+
+            ContactExt ext = contact.GetExtension<ContactExt>();
+            if (ext.UsrMailchimpListID == null)
+                GetListMembership(contact);
+
+            var manager = GetManager();
+            var member = manager.GetMember(ext.UsrMailchimpListID, contact.EMail);
+
+            // TODO - see if we can pull subscribed / unsunscribed info(date, reason, by whom) onto the contact itself
+
+            ext.UsrMailchimpListStatus = member.Status.ToString();
+            Base.ContactCurrent.Update(contact);
+            Base.Save.Press();
+        }
+ 
+        public PXAction<Contact> syncMailchimpStatus;
+        [PXProcessButton]
+        [PXUIField(DisplayName = "Sync Mailchimp")]
+        protected virtual IEnumerable SyncMailchimpStatus(PXAdapter adapter)
+        {
+            foreach (Contact contact in adapter.Get())
+            {
+                this.Base.Actions.PressSave();
+
+                PXLongOperation.StartOperation(Base, delegate ()
+                {
+                    ContactMaint graph = PXGraph.CreateInstance<ContactMaint>();
+                    ContactMaint_Extension graphExt = graph.GetExtension<ContactMaint_Extension>();
+                    graphExt.UpdateMailchimpStatus(contact);
+                });
+
+                yield return contact;
+            }
+        }
+        #endregion
 
         #region Get Mailchimp Activities
 
@@ -138,20 +186,18 @@ namespace Mailchimp
 
         public void UpdateMailchimpActivities(Contact contact)
         {
+
+            // TODO - looks like the API might limit to 50 activities. Do we need to test that? are we worried about that?
+
             Base.ContactCurrent.Current = contact;
             if (contact == null) return;
 
             ContactExt ext = contact.GetExtension<ContactExt>();
 
             if (ext.UsrMailchimpListID == null)
-            {
-                // throw exception, or just go try to find the list
-            }
-
-            // TODO - make sure the contact is on a mailchimp list before trying to get activities
+                GetListMembership(contact);
 
             var manager = GetManager();
-
             EPActivityType mCActivityType = GetOrCreateMailchimpActivityType();
 
             // This code works but doesn't do us any good because the API can't handle dates 
@@ -161,9 +207,6 @@ namespace Mailchimp
                  .OrderBy(ac => ac.StartDate); // for mailchimp activities, the start date is pulled from the mailchimp timestamp
             DateTime? mostRecentMCDateInAC = mCActivitesInAcumatica.Last().StartDate; */
             // 2. Pull any activities from MC that are since that date (or pull them all and only insert them if they are since that date?)
-
-            // TODO - looks like the API might limit to 50 activities. Do we need to test that? are we worried about that?
-
 
             try
             {
@@ -175,7 +218,6 @@ namespace Mailchimp
                 {
                     RegisterActivities(activities.ToList(), mCActivityType);
                 }
-
             }
             catch (Exception ex)
             {
