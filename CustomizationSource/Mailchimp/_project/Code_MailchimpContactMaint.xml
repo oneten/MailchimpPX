@@ -66,16 +66,12 @@ namespace Mailchimp
 
         public void GetMailchimpData(Contact contact)
         {
-
             Base.ContactCurrent.Current = contact;
             if (contact == null) return;
             ContactExt ext = contact.GetExtension<ContactExt>();
 
-            // 1. Get list
             GetListMembership(contact);
-            // 2. Get subscription status
             UpdateMailchimpStatus(contact);
-            // 3. Get activities
             UpdateMailchimpActivities(contact);
 
             Base.ContactCurrent.Update(contact);
@@ -154,7 +150,17 @@ namespace Mailchimp
 
             // TODO - see if we can pull subscribed / unsunscribed info(date, reason, by whom) onto the contact itself
 
+            // TODO - need to account for the possibility of these being null values in MC
+
             ext.UsrMailchimpListStatus = member.Status.ToString();
+            ext.UsrMailchimpMemberLastChanged = DateTime.ParseExact(member.LastChanged, "yyyy-MM-ddTHH:mm:sszzzz", CultureInfo.InvariantCulture);
+           // ext.UsrMailchimpAverageClickRate = member.Stats.AverageClickRate;
+           // ext.UsrMailchimpAverageOpenRate = member.Stats.AverageOpenRate;
+           // ext.UsrMailchimpSubscriberSource = string.Join("", member.Source.Take(100)); // truncate to 100 characters because that's how long the MC db field is
+            //ext.UsrMailchimpUnsubscribeReason = string.Join("", member.UnsubscribeReason.Take(100)); // truncate to 100 characters because that's how long the MC db field is
+            ext.UsrMailchimpTimestampOpt = DateTime.ParseExact(member.TimestampOpt, "yyyy-MM-ddTHH:mm:sszzzz", CultureInfo.InvariantCulture);
+            //ext.UsrMailchimpTimestampSignup = DateTime.ParseExact(member.TimestampSignup, "yyyy-MM-ddTHH:mm:sszzzz", CultureInfo.InvariantCulture);
+
             Base.ContactCurrent.Update(contact);
             Base.Save.Press();
         }
@@ -321,11 +327,13 @@ namespace Mailchimp
 
             foreach (MC.Activity activity in result)
             {
-                if ( !(activity.Action == "Ubsub") && !ActivityExists(activity)) // Make sure it hasn't already been pulled into Acumatica
+                /* if ( !(activity.Action == "Ubsub") && !ActivityExists(activity)) // Make sure it hasn't already been pulled into Acumatica
                                                                                  // Exclude unsubscribe from the activities list since unsubscribes show up but subscribes don't
                                                                                  // Also, if someone ubsubscribes and then resubscribes, the resubscribe doesn't show as an activity, so it's confusing
-                                                                                 // Moreover, ifthey unsubscribe a second time, the first ubsubscribe is no longer in the activity stream, which is also confusing
-
+                                                                                 // Moreover, ifthey unsubscribe a second time, the first ubsubscribe is no longer in the activity stream, which is also confusing 
+                                                                                 // We decided this is rare enough that we'll just go ahead and pull unsubscribes in, even if it's a little confusing sometimes
+                                                                                 */
+                if (!ActivityExists(activity)) // Make sure it hasn't already been pulled into Acumatica
                 {
                     //Insert Activity to Acumatica
                     CRActivity cRActivity = new CRActivity();

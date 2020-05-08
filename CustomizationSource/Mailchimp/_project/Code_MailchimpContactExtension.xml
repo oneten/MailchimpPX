@@ -33,6 +33,63 @@ namespace Mailchimp
     public virtual string UsrMailchimpListStatus { get; set; }
     public abstract class usrMailchimpListStatus : IBqlField { }
     #endregion
+      
+      
+    #region UsrMailchimpMemberLastChanged
+    [PXDBDate]
+    [PXUIField(DisplayName="Member Last Changed")]
+
+    public virtual DateTime? UsrMailchimpMemberLastChanged { get; set; }
+    public abstract class usrMailchimpMemberLastChanged : PX.Data.BQL.BqlDateTime.Field<usrMailchimpMemberLastChanged> { }
+    #endregion
+
+    #region UsrMailchimpAverageClickRate
+    [PXDBDecimal]
+    [PXUIField(DisplayName="Avg. Click Rate")]
+
+    public virtual Decimal? UsrMailchimpAverageClickRate { get; set; }
+    public abstract class usrMailchimpAverageClickRate : PX.Data.BQL.BqlDecimal.Field<usrMailchimpAverageClickRate> { }
+    #endregion
+
+    #region UsrMailchimpAverageOpenRate
+    [PXDBDecimal]
+    [PXUIField(DisplayName="Avg. Open Rate")]
+
+    public virtual Decimal? UsrMailchimpAverageOpenRate { get; set; }
+    public abstract class usrMailchimpAverageOpenRate : PX.Data.BQL.BqlDecimal.Field<usrMailchimpAverageOpenRate> { }
+    #endregion
+
+    #region UsrMailchimpSubscriberSource
+    [PXDBString(100)]
+    [PXUIField(DisplayName="Subscriber Source")]
+
+    public virtual string UsrMailchimpSubscriberSource { get; set; }
+    public abstract class usrMailchimpSubscriberSource : PX.Data.BQL.BqlString.Field<usrMailchimpSubscriberSource> { }
+    #endregion
+
+    #region UsrMailchimpUnsubscribeReason
+    [PXDBString(100)]
+    [PXUIField(DisplayName="Unsubscribe Reason")]
+
+    public virtual string UsrMailchimpUnsubscribeReason { get; set; }
+    public abstract class usrMailchimpUnsubscribeReason : PX.Data.BQL.BqlString.Field<usrMailchimpUnsubscribeReason> { }
+    #endregion
+
+    #region UsrMailchimpTimestampOpt
+    [PXDBDate]
+    [PXUIField(DisplayName="Opt In")]
+
+    public virtual DateTime? UsrMailchimpTimestampOpt { get; set; }
+    public abstract class usrMailchimpTimestampOpt : PX.Data.BQL.BqlDateTime.Field<usrMailchimpTimestampOpt> { }
+    #endregion
+
+    #region UsrMailchimpTimestampSignup
+    [PXDBDate]
+    [PXUIField(DisplayName="Signup")]
+
+    public virtual DateTime? UsrMailchimpTimestampSignup { get; set; }
+    public abstract class usrMailchimpTimestampSignup : PX.Data.BQL.BqlDateTime.Field<usrMailchimpTimestampSignup> { }
+    #endregion
   }
 }]]></CDATA>
 </Graph>
