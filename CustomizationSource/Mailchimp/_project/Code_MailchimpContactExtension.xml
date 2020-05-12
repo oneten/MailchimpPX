@@ -21,7 +21,7 @@ namespace Mailchimp
     [PXDBString(10)]
     [PXSelector(typeof(Search<CRMailchimpList.listID>),
             SubstituteKey = typeof(CRMailchimpList.listCD))]
-    [PXUIField(DisplayName="Mailchimp List")]
+    [PXUIField(DisplayName="Mailchimp List", Enabled=false)]
 
     public virtual string UsrMailchimpListID { get; set; }
     public abstract class usrMailchimpListID : IBqlField { }
@@ -29,7 +29,7 @@ namespace Mailchimp
 
     #region UsrMailchimpListStatus
     [PXDBString(25)]
-    [PXUIField(DisplayName="Mailchimp List Status"/*, Enabled=false*/)]
+    [PXUIField(DisplayName="Mailchimp List Status", Enabled=false)]
     public virtual string UsrMailchimpListStatus { get; set; }
     public abstract class usrMailchimpListStatus : IBqlField { }
     #endregion
@@ -37,7 +37,7 @@ namespace Mailchimp
       
     #region UsrMailchimpMemberLastChanged
     [PXDBDate]
-    [PXUIField(DisplayName="Member Last Changed")]
+    [PXUIField(DisplayName="Member Last Changed", Enabled=false)]
 
     public virtual DateTime? UsrMailchimpMemberLastChanged { get; set; }
     public abstract class usrMailchimpMemberLastChanged : PX.Data.BQL.BqlDateTime.Field<usrMailchimpMemberLastChanged> { }
@@ -45,7 +45,7 @@ namespace Mailchimp
 
     #region UsrMailchimpAverageClickRate
     [PXDBDecimal]
-    [PXUIField(DisplayName="Avg. Click Rate")]
+    [PXUIField(DisplayName="Avg. Click Rate (%)", Enabled=false)]
 
     public virtual Decimal? UsrMailchimpAverageClickRate { get; set; }
     public abstract class usrMailchimpAverageClickRate : PX.Data.BQL.BqlDecimal.Field<usrMailchimpAverageClickRate> { }
@@ -53,7 +53,7 @@ namespace Mailchimp
 
     #region UsrMailchimpAverageOpenRate
     [PXDBDecimal]
-    [PXUIField(DisplayName="Avg. Open Rate")]
+    [PXUIField(DisplayName="Avg. Open Rate (%)", Enabled=false)]
 
     public virtual Decimal? UsrMailchimpAverageOpenRate { get; set; }
     public abstract class usrMailchimpAverageOpenRate : PX.Data.BQL.BqlDecimal.Field<usrMailchimpAverageOpenRate> { }
@@ -61,7 +61,7 @@ namespace Mailchimp
 
     #region UsrMailchimpSubscriberSource
     [PXDBString(100)]
-    [PXUIField(DisplayName="Subscriber Source")]
+    [PXUIField(DisplayName="Subscriber Source", Enabled=false)]
 
     public virtual string UsrMailchimpSubscriberSource { get; set; }
     public abstract class usrMailchimpSubscriberSource : PX.Data.BQL.BqlString.Field<usrMailchimpSubscriberSource> { }
@@ -69,7 +69,7 @@ namespace Mailchimp
 
     #region UsrMailchimpUnsubscribeReason
     [PXDBString(100)]
-    [PXUIField(DisplayName="Unsubscribe Reason")]
+    [PXUIField(DisplayName="Unsubscribe Reason", Enabled=false)]
 
     public virtual string UsrMailchimpUnsubscribeReason { get; set; }
     public abstract class usrMailchimpUnsubscribeReason : PX.Data.BQL.BqlString.Field<usrMailchimpUnsubscribeReason> { }
@@ -77,7 +77,7 @@ namespace Mailchimp
 
     #region UsrMailchimpTimestampOpt
     [PXDBDate]
-    [PXUIField(DisplayName="Opt In")]
+    [PXUIField(DisplayName="Opt In", Enabled=false)]
 
     public virtual DateTime? UsrMailchimpTimestampOpt { get; set; }
     public abstract class usrMailchimpTimestampOpt : PX.Data.BQL.BqlDateTime.Field<usrMailchimpTimestampOpt> { }
@@ -85,7 +85,7 @@ namespace Mailchimp
 
     #region UsrMailchimpTimestampSignup
     [PXDBDate]
-    [PXUIField(DisplayName="Signup")]
+    [PXUIField(DisplayName="Signup", Enabled=false)]
 
     public virtual DateTime? UsrMailchimpTimestampSignup { get; set; }
     public abstract class usrMailchimpTimestampSignup : PX.Data.BQL.BqlDateTime.Field<usrMailchimpTimestampSignup> { }
