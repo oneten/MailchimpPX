@@ -23,6 +23,7 @@ namespace Mailchimp
             public const string Status = "S";
             public const string Activity = "A";
             public const string List = "L";
+            public const string GetAll = "G";
         }
         [Serializable]
         public class ContactMailchimpProcessFilter : IBqlTable
@@ -34,8 +35,8 @@ namespace Mailchimp
             protected string _Action;
             [PXString(2)]
             [PXStringList(
-                new[] { UpdateMailchimpActions.Status, UpdateMailchimpActions.Activity, UpdateMailchimpActions.List },
-                new[] { "Update Status", "Update Activity", "Sync Lists" }
+                new[] { UpdateMailchimpActions.GetAll, UpdateMailchimpActions.Status, UpdateMailchimpActions.Activity, UpdateMailchimpActions.List },
+                new[] { "Get MailChimp Data", "Update Status", "Update Activity", "Sync Lists" }
             )]
             [PXUnboundDefault(UpdateMailchimpActions.Status)]
             public virtual string Action
@@ -64,6 +65,9 @@ namespace Mailchimp
             IEnumerable newView;
             switch (actionID)
             {
+                case UpdateMailchimpActions.GetAll:
+                    newView = PXSelect<Contact>.Select(this);
+                    break;
                 case UpdateMailchimpActions.List:
                     newView = PXSelect<Contact>.Select(this);
                     break;
@@ -85,6 +89,9 @@ namespace Mailchimp
             {               
                 switch(filter.Action)
                 {
+                    case UpdateMailchimpActions.GetAll:
+                        Contacts.SetProcessDelegate(list => ProcessGetMailchimpData(list));
+                        break;
                     case UpdateMailchimpActions.Status:
                         Contacts.SetProcessDelegate( list => ProcessUpdateMailchimpStatuses(list));
                         break;
@@ -100,11 +107,60 @@ namespace Mailchimp
             }
         }
 
-      
+        public static void ProcessGetMailchimpData(List<Contact> contacts)
+        {
+            Debug.WriteLine("get all MC data");
+            var graph = PXGraph.CreateInstance<ContactMaint>();
+            bool errorOccurred = false;
+            ContactMaint_Extension graphExt = graph.GetExtension<ContactMaint_Extension>();
+
+            foreach (var contact in contacts)
+            {
+                try
+                {
+                    graphExt.GetMailchimpData(contact);
+
+                    PXProcessing.SetInfo(String.Format(
+                        "Contact {0} has been updated.",
+                        contact.DisplayName));
+                }
+                catch (Exception ex)
+                {
+                    errorOccurred = true;
+                    PXProcessing.SetError(contacts.IndexOf(contact), ex.InnerException);
+                }
+            }
+            if (errorOccurred)
+                throw new PXException("At least one contact hasn't been processed.");
+
+        }
+
         public static void ProcessSyncMailchimpLists(List<Contact> contacts)
         {
             Debug.WriteLine("syncing lists");
-            // TODO - put code here!
+            var graph = PXGraph.CreateInstance<ContactMaint>();
+            bool errorOccurred = false;
+            ContactMaint_Extension graphExt = graph.GetExtension<ContactMaint_Extension>();
+
+
+            foreach (var contact in contacts)
+            {
+                try
+                {
+                    graphExt.GetListMembership(contact);
+
+                    PXProcessing.SetInfo(String.Format(
+                        "Contact {0} has been updated.",
+                        contact.DisplayName));
+                }
+                catch (Exception ex)
+                {
+                    errorOccurred = true;
+                    PXProcessing.SetError(contacts.IndexOf(contact), ex.InnerException);
+                }
+            }
+            if (errorOccurred)
+                throw new PXException("At least one contact hasn't been processed.");
 
         }
 
