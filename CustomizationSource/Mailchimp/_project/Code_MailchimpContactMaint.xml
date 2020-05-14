@@ -89,22 +89,41 @@ namespace Mailchimp
         {
             MC.Member member = null;
 
-            foreach (var mailchimpList in manager.GetLists())
+            if (contact.EMail == null)
             {
-                // see if the contact is on that list
-                // if yes: save list on contact, then break (don't worry about checking the other lists if you've already found a match)
-                if (contact.EMail != null)
+                // throw warning and don't try anything else
+                String noEmailString = "The contact does not have an email address and therefore cannot be found in Mailchimp.";
+                //throw new PXOperationCompletedWithWarningException(noEmailString); // this gives the message but also gives a green checkmark, so no one will know to check the message
+                throw new PXSetPropertyException(noEmailString, PXErrorLevel.Warning);
+            }
+            else
+            {
+                bool onList = false;
+
+                foreach (var mailchimpList in manager.GetLists())
                 {
-                    try
+                    // see if the contact is on that list
+                    // if yes: save list on contact, then break (don't worry about checking the other lists if you've already found a match)
+                    if (contact.EMail != null)
                     {
-                        member = manager.GetMember(mailchimpList.Id, contact.EMail);
-                        ext.UsrMailchimpListID = mailchimpList.Id;
-                        break;
+                        try
+                        {
+                            member = manager.GetMember(mailchimpList.Id, contact.EMail);
+                            ext.UsrMailchimpListID = mailchimpList.Id;
+                            onList = true;
+                            break;
+                        }
+                        catch (MemberDoesNotExistException)
+                        {
+                            // if the user doesn't exist on this MC list, don't throw an exception. Continue to try the next list. 
+                        }
                     }
-                    catch (MemberDoesNotExistException)
-                    {
-                        // if the user doesn't exist on a MC list, don't throw an exception. Just continue/try the next list. 
-                    }
+                }
+
+                // If not any list, return a message to the user
+                if (onList == false)
+                {
+                    throw new PXSetPropertyException("The contact is not on any Mailchimp lists", PXErrorLevel.Warning);
                 }
             }
 
@@ -293,7 +312,7 @@ namespace Mailchimp
 
             if (existingType != null)
             {
-                mailChimpActivityType = existingType; // TODO: should we make sure this is active or update any other fields here?
+                mailChimpActivityType = existingType; 
             }
             else
             {
