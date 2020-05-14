@@ -24,8 +24,9 @@
 			<px:PXGridLevel DataMember="Contacts">
 			    <Columns>
 				<px:PXGridColumn AllowCheckAll="True" AllowShowHide="True" TextAlign="Center" Type="CheckBox" DataField="Selected" Width="40px" ></px:PXGridColumn>
+				<px:PXGridColumn DataField="ContactID" Width="70" ></px:PXGridColumn>
 				<px:PXGridColumn DataField="DisplayName" Width="280" ></px:PXGridColumn>
-				<px:PXGridColumn DataField="Status" Width="70" ></px:PXGridColumn>
+				<px:PXGridColumn Type="CheckBox" DataField="IsActive" Width="60" ></px:PXGridColumn>
 				<px:PXGridColumn DataField="BAccountID" Width="140" ></px:PXGridColumn>
 				<px:PXGridColumn DataField="EMail" Width="280" ></px:PXGridColumn>
 				<px:PXGridColumn DataField="UsrMailchimpListStatus" Width="140" ></px:PXGridColumn>
