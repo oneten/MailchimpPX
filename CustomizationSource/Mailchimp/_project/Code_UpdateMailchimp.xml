@@ -115,13 +115,28 @@ namespace Mailchimp
 
             foreach (var contact in contacts)
             {
+
+                /*graphExt.GetMailchimpData(contact);
+                string message = String.Format("Contact {0} has been updated.", contact.DisplayName);
+                PXProcessing.SetInfo(contacts.IndexOf(contact), message);*/
+                
                 try
                 {
                     graphExt.GetMailchimpData(contact);
                     string message = String.Format("Contact {0} has been updated.", contact.DisplayName);
                     PXProcessing.SetInfo(contacts.IndexOf(contact), message);
                 }
-                catch (Exception ex)
+                catch (PXOuterException outerEx)
+                {
+                    errorOccurred = true;
+                    string errorMsg = "";
+                    foreach (string err in outerEx.InnerMessages)
+                    {
+                        errorMsg += Environment.NewLine + err;
+                    }
+                    PXProcessing.SetError(contacts.IndexOf(contact), errorMsg);
+                }
+                catch (Exception ex) // TODO - try to be more specific than just catching general excpetion
                 {
                     PXSetPropertyException exception = ex as PXSetPropertyException;
                     if (exception != null && exception.ErrorLevel == PXErrorLevel.Error)

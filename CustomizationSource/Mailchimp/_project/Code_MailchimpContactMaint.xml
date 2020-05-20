@@ -79,8 +79,18 @@ namespace Mailchimp
                 GetContactActivities(manager, ext);
             }
 
-            Base.ContactCurrent.Update(contact);
-            Base.Save.Press();
+           // try
+            //{
+                Base.ContactCurrent.Update(contact);
+                Base.Save.Press();
+            /*} catch (Exception ex)
+            {
+                throw ex.InnerException;
+            }*/
+
+            // TODO - when we run this with Todd bloom we get an error on avg open rate because it's 1 not a decimal. Before fixing that error though, I want to see how I can 
+            // get that error to show up on the processing screen. If you run Get Mailchimp Data for him on the contact screen, the error message is specific, but if you run 
+            // it on the processing screen, it's vague. The message is in inner messages (or something like that), so I think you have to loop through those to display it
         }
         #endregion
 
@@ -94,7 +104,12 @@ namespace Mailchimp
                 // throw warning and don't try anything else
                 String noEmailString = "The contact does not have an email address and therefore cannot be found in Mailchimp.";
                 //throw new PXOperationCompletedWithWarningException(noEmailString); // this gives the message but also gives a green checkmark, so no one will know to check the message
+
+                // throw new NoEmailAddress exception with a message
+                // then when calling this, catch NoEmailAddress exception and then handle that there (at that point, set the error level)
                 throw new PXSetPropertyException(noEmailString, PXErrorLevel.Warning);
+                
+
             }
             else
             {
@@ -115,7 +130,7 @@ namespace Mailchimp
                         }
                         catch (MemberDoesNotExistException)
                         {
-                            // if the user doesn't exist on this MC list, don't throw an exception. Continue to try the next list. 
+                            // if the user doesn't exist on this MC list, don't throw an exception yet. Continue to try the next list and only throw exception if not on any list. 
                         }
                     }
                 }
@@ -123,11 +138,9 @@ namespace Mailchimp
                 // If not any list, return a message to the user
                 if (onList == false)
                 {
-                    throw new PXSetPropertyException("The contact is not on any Mailchimp lists", PXErrorLevel.Warning);
+                    throw new MemberDoesNotExistException();
                 }
             }
-
-            // TODO: Do you want to tell the user if the member is not on any mailchimp list? You don't really want an error, since it's not an error just a fact.
 
             // TODO: Does our code account for things like the API being down vs a contact just not being on a list?
 
@@ -347,7 +360,7 @@ namespace Mailchimp
                 if (acumaticaActivity.Type == mCActivityType.Type && activity.Timestamp == acumaticaActivityExt.UsrMailchimpTimestamp && titleCasedAction == acumaticaActivityExt.UsrMailchimpAction)
                     return true; // activity already exists in Acumatica
             }
-
+            
             return false; // activity doesn't exist in Acumatica
         }
 
