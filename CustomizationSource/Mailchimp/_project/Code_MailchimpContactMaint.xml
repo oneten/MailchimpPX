@@ -79,18 +79,8 @@ namespace Mailchimp
                 GetContactActivities(manager, ext);
             }
 
-           // try
-            //{
-                Base.ContactCurrent.Update(contact);
-                Base.Save.Press();
-            /*} catch (Exception ex)
-            {
-                throw ex.InnerException;
-            }*/
-
-            // TODO - when we run this with Todd bloom we get an error on avg open rate because it's 1 not a decimal. Before fixing that error though, I want to see how I can 
-            // get that error to show up on the processing screen. If you run Get Mailchimp Data for him on the contact screen, the error message is specific, but if you run 
-            // it on the processing screen, it's vague. The message is in inner messages (or something like that), so I think you have to loop through those to display it
+            Base.ContactCurrent.Update(contact);
+            Base.Save.Press();
         }
         #endregion
 
@@ -98,48 +88,29 @@ namespace Mailchimp
         public MC.Member GetMemberOnList(MailchimpPXManager manager, Contact contact, ContactExt ext)
         {
             MC.Member member = null;
+            bool onList = false;
 
-            if (contact.EMail == null)
+            foreach (var mailchimpList in manager.GetLists())
             {
-                // throw warning and don't try anything else
-                String noEmailString = "The contact does not have an email address and therefore cannot be found in Mailchimp.";
-                //throw new PXOperationCompletedWithWarningException(noEmailString); // this gives the message but also gives a green checkmark, so no one will know to check the message
-
-                // throw new NoEmailAddress exception with a message
-                // then when calling this, catch NoEmailAddress exception and then handle that there (at that point, set the error level)
-                throw new PXSetPropertyException(noEmailString, PXErrorLevel.Warning);
-                
-
+                // see if the contact is on that list
+                // if yes: save list on contact, then break (don't worry about checking the other lists if you've already found a match)
+                try
+                {
+                    member = manager.GetMember(mailchimpList.Id, contact.EMail);
+                    ext.UsrMailchimpListID = mailchimpList.Id;
+                    onList = true;
+                    break;
+                }
+                catch (MemberDoesNotExistException)
+                {
+                    // if the user doesn't exist on this MC list, don't throw an exception yet. Continue to try the next list and only throw exception if not on any list. 
+                }
             }
-            else
+
+            // If not any list, return a message to the user
+            if (onList == false)
             {
-                bool onList = false;
-
-                foreach (var mailchimpList in manager.GetLists())
-                {
-                    // see if the contact is on that list
-                    // if yes: save list on contact, then break (don't worry about checking the other lists if you've already found a match)
-                    if (contact.EMail != null)
-                    {
-                        try
-                        {
-                            member = manager.GetMember(mailchimpList.Id, contact.EMail);
-                            ext.UsrMailchimpListID = mailchimpList.Id;
-                            onList = true;
-                            break;
-                        }
-                        catch (MemberDoesNotExistException)
-                        {
-                            // if the user doesn't exist on this MC list, don't throw an exception yet. Continue to try the next list and only throw exception if not on any list. 
-                        }
-                    }
-                }
-
-                // If not any list, return a message to the user
-                if (onList == false)
-                {
-                    throw new MemberDoesNotExistException();
-                }
+                throw new MemberDoesNotExistException();
             }
 
             // TODO: Does our code account for things like the API being down vs a contact just not being on a list?
@@ -152,8 +123,8 @@ namespace Mailchimp
         {
             ext.UsrMailchimpListStatus = member.Status.ToString();
             ext.UsrMailchimpMemberLastChanged = String.IsNullOrEmpty(member.LastChanged) ? (DateTime?)null : DateTime.ParseExact(member.LastChanged, "yyyy-MM-ddTHH:mm:sszzzz", CultureInfo.InvariantCulture);
-            ext.UsrMailchimpAverageClickRate = (decimal)member.Stats.AverageClickRate * 100; // multiply by 100 because it's a percentage
-            ext.UsrMailchimpAverageOpenRate = (decimal)member.Stats.AverageOpenRate * 100; // multiple by 100 because it's a percentage
+            ext.UsrMailchimpAverageClickRate = Convert.ToDecimal(member.Stats.AverageClickRate * 100); // multiply by 100 because it's a percentage
+            ext.UsrMailchimpAverageOpenRate = Convert.ToDecimal(member.Stats.AverageOpenRate * 100); // multiple by 100 because it's a percentage
             //ext.UsrMailchimpSubscriberSource = String.IsNullOrEmpty(member.Source) ? "" : string.Join("", member.Source.Take(100)); // truncate to 100 characters because that's how long the MC db field is
             // TODO - Source is available according to the reference documentation but for some reason isn't in the Member DAC - how can we add it?
             ext.UsrMailchimpUnsubscribeReason = String.IsNullOrEmpty(member.UnsubscribeReason) ? "" : string.Join("", member.UnsubscribeReason.Take(100)); // truncate to 100 characters because that's how long the MC db field is
@@ -174,24 +145,15 @@ namespace Mailchimp
             DateTime? mostRecentMCDateInAC = mCActivitesInAcumatica.Last().StartDate; */
             // 2. Pull any activities from MC that are since that date (or pull them all and only insert them if they are since that date?)
 
-            try
+            CRMailchimpList list = PXSelect<CRMailchimpList,
+                Where<CRMailchimpList.listID, Equal<Required<CRMailchimpList.listID>>>>.Select(Base, ext.UsrMailchimpListID);
+
+            // TODO - looks like the API might limit to 50 activities. Do we need to test that? are we worried about that?
+
+            var activities = manager.GetActivities(list.ListID, Base.Contact.Current.EMail);
+            if (activities != null)
             {
-                CRMailchimpList list = PXSelect<CRMailchimpList,
-                    Where<CRMailchimpList.listID, Equal<Required<CRMailchimpList.listID>>>>.Select(Base, ext.UsrMailchimpListID);
-
-                // TODO - verify that Select(Base . . .) is grabbing the right thing when this is run from a mass processing screen
-
-                // TODO - looks like the API might limit to 50 activities. Do we need to test that? are we worried about that?
-
-                var activities = manager.GetActivities(list.ListID, Base.Contact.Current.EMail);
-                if (activities != null)
-                {
-                    RegisterActivities(activities.ToList(), mCActivityType);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex.InnerException;
+                RegisterActivities(activities.ToList(), mCActivityType);
             }
         }
 

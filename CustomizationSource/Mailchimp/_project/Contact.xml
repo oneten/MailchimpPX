@@ -2,8 +2,8 @@
     <Column TableName="Contact" ColumnName="UsrMailchimpListID" ColumnType="string" AllowNull="True" MaxLength="10" DecimalPrecision="2" DecimalLength="10" IsNewColumn="True" IsUnicode="True" />
     <Column TableName="Contact" ColumnName="UsrMailchimpListStatus" ColumnType="string" AllowNull="True" MaxLength="25" DecimalPrecision="2" DecimalLength="25" IsNewColumn="True" IsUnicode="True" />
     <Column TableName="Contact" ColumnName="UsrMailchimpMemberLastChanged" ColumnType="date" AllowNull="True" MaxLength="25" DecimalPrecision="2" IsNewColumn="True" IsUnicode="True" />
-    <Column TableName="Contact" ColumnName="UsrMailchimpAverageClickRate" ColumnType="decimal" AllowNull="True" MaxLength="6" DecimalPrecision="4" DecimalLength="6" IsNewColumn="True" IsUnicode="True" />
-    <Column TableName="Contact" ColumnName="UsrMailchimpAverageOpenRate" ColumnType="decimal" AllowNull="True" MaxLength="6" DecimalPrecision="4" DecimalLength="6" IsNewColumn="True" IsUnicode="True" />
+    <Column TableName="Contact" ColumnName="UsrMailchimpAverageClickRate" ColumnType="decimal" AllowNull="True" MaxLength="6" DecimalPrecision="2" DecimalLength="5" IsNewColumn="True" IsUnicode="True" />
+    <Column TableName="Contact" ColumnName="UsrMailchimpAverageOpenRate" ColumnType="decimal" AllowNull="True" MaxLength="6" DecimalPrecision="2" DecimalLength="5" IsNewColumn="True" IsUnicode="True" />
     <Column TableName="Contact" ColumnName="UsrMailchimpSubscriberSource" ColumnType="string" AllowNull="True" MaxLength="250" DecimalPrecision="2" DecimalLength="250" IsNewColumn="True" IsUnicode="True" />
     <Column TableName="Contact" ColumnName="UsrMailchimpUnsubscribeReason" ColumnType="string" AllowNull="True" MaxLength="100" DecimalPrecision="2" DecimalLength="100" IsNewColumn="True" IsUnicode="True" />
     <Column TableName="Contact" ColumnName="UsrMailchimpTimestampOpt" ColumnType="date" AllowNull="True" MaxLength="25" DecimalPrecision="2" IsNewColumn="True" IsUnicode="True" />

@@ -41,6 +41,10 @@ namespace MailchimpPXLib
 
         public Member GetMember(string listId, string email)
         {
+            if (String.IsNullOrEmpty(email))
+            {
+                throw new NoEmailException();
+            }
             var email_md5 = CalculateMD5Hash(email);
             Member member;
             try
