@@ -47,14 +47,19 @@ namespace MailchimpPXLib
             }
             var email_md5 = CalculateMD5Hash(email);
             Member member;
+
             try
             {
                 member = Task.Run(async () => await manager.Members.GetAsync(listId, email_md5)).Result;
             }
+            //catch (); // Catch the API being down and just throw and error - don't try to do anything else or change the data
             catch (AggregateException ae) when (ae.InnerException is MailChimpNotFoundException)
             {
                 // If fetching the member on the list doesn't find anything, try to get the list.
                 // If we can't find the list, then the list doesn't exist. Otherwise, the member doesn't exist on the list.
+
+                // TODO - what if the API is down? Don't mistake that for the member not being on the list
+
                 try
                 {
                     GetList(listId);
@@ -67,6 +72,10 @@ namespace MailchimpPXLib
             }
             catch (AggregateException ae)
             {
+
+                // TODO - handle case if member is archived. Error is "Requested value 'archived' was not found."
+
+                //var type = ae.GetType();
                 throw ae.InnerException;
             }
 

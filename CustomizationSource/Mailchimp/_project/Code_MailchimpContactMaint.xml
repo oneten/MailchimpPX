@@ -72,6 +72,11 @@ namespace Mailchimp
             ContactExt ext = contact.GetExtension<ContactExt>();
             var manager = GetManager();
 
+            // TODO - what if the API is having trouble? Put this whole thing in a try/catch (perhaps both here and on the processing screen?) want an API error to bubble up
+            // to the top and stop the process. Alternatively, since it's hard to know exactly what to catch, we could also just deploy and wait until we run into trouble and then
+            // catch it and deal with it. That approach seems ok as long as we're not deleting data if the API is down. We haven't yet addressed how we'll handle it if a contact
+            // is deleted from Mailchimp. Will we clear the mailchimp data that's in Acumatica? We should at least indicate that they're deleted. How will we know the difference between 
+            // a contact being deleted and the API being broken or timing out or something? And what are the consequences?
             MC.Member member = GetMemberOnList(manager, contact, ext);
             if (member != null)
             {
@@ -103,6 +108,9 @@ namespace Mailchimp
                 }
                 catch (MemberDoesNotExistException)
                 {
+                    // TODO -- what if member was on list but was deleted or archived. 
+                    // In that case (at least the deleted case), we should probably clear the list field or at least indicate they've been deleted from MC
+
                     // if the user doesn't exist on this MC list, don't throw an exception yet. Continue to try the next list and only throw exception if not on any list. 
                 }
             }
