@@ -59,6 +59,11 @@ namespace MailchimpPXLib
                 // If we can't find the list, then the list doesn't exist. Otherwise, the member doesn't exist on the list.
 
                 // TODO - what if the API is down? Don't mistake that for the member not being on the list
+                // TODO - this code currently doesn't handle a contact who had been in Mailchimp getting deleted. What should that behavior be? 
+                    // Probably if a contact was deleted from MC, you should blank the MC list and status field in Acumatica. But you really want to know
+                    // that they are deleted in that case and not just that you're getting a timeout or some sort of API failture
+                    // LaSalle doesn't delete contacts from Mailchimp, so this isn't really something we'll run into. But if we ever want to do more with 
+                    // this, we'll need to address deletion.
 
                 try
                 {
@@ -72,10 +77,6 @@ namespace MailchimpPXLib
             }
             catch (AggregateException ae)
             {
-
-                // TODO - handle case if member is archived. Error is "Requested value 'archived' was not found."
-
-                //var type = ae.GetType();
                 throw ae.InnerException;
             }
 

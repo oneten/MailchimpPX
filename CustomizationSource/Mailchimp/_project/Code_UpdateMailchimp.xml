@@ -20,10 +20,10 @@ namespace Mailchimp
 
         public static class UpdateMailchimpActions
         {
+            public const string GetAll = "G";
             public const string Status = "S";
             public const string Activity = "A";
             public const string List = "L";
-            public const string GetAll = "G";
         }
         [Serializable]
         public class ContactMailchimpProcessFilter : IBqlTable
@@ -38,7 +38,7 @@ namespace Mailchimp
                 new[] { UpdateMailchimpActions.GetAll, UpdateMailchimpActions.Status, UpdateMailchimpActions.Activity, UpdateMailchimpActions.List },
                 new[] { "Get MailChimp Data", "Update Status", "Update Activity", "Sync Lists" }
             )]
-            [PXUnboundDefault(UpdateMailchimpActions.Status)]
+            [PXUnboundDefault(UpdateMailchimpActions.GetAll)]
             public virtual string Action
             {
                 get
