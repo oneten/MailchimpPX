@@ -65,11 +65,16 @@ namespace Mailchimp
             IEnumerable newView;
             switch (actionID)
             {
+                // need to limit contacts to: Active, Contact Type = Person, has email address
                 case UpdateMailchimpActions.GetAll:
-                    newView = PXSelect<Contact>.Select(this);
+                    newView = PXSelect<Contact, Where<Contact.contactType, Equal<ContactTypesAttribute.person>,
+                        And<Contact.eMail, IsNotNull,
+                        And<Contact.isActive, Equal<True>>>>>.Select(this);
                     break;
                 case UpdateMailchimpActions.List:
-                    newView = PXSelect<Contact>.Select(this);
+                    newView = PXSelect<Contact, Where<Contact.contactType, Equal<ContactTypesAttribute.person>,
+                        And<Contact.eMail, IsNotNull,
+                        And<Contact.isActive, Equal<True>>>>>.Select(this);
                     break;
                 case UpdateMailchimpActions.Status:
                 case UpdateMailchimpActions.Activity:
