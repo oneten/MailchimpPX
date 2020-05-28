@@ -7,7 +7,7 @@
             <AddItem>
                 <PXLayoutRule TypeFullName="PX.Web.UI.PXLayoutRule">
                     <Prop Key="Virtual:ApplyStylesheetSkin" />
-                    <Prop Key="ID" Value="CstPXLayoutRule1" />
+                    <Prop Key="ID" Value="MCCstPXLayoutRule1" />
                     <Prop Key="StartGroup" Value="True" />
                     <Prop Key="GroupCaption" Value="Mailchimp" />
                 </PXLayoutRule>
@@ -15,28 +15,28 @@
             <AddItem>
                 <PXSelector TypeFullName="PX.Web.UI.PXSelector">
                     <Prop Key="Virtual:ApplyStylesheetSkin" />
-                    <Prop Key="ID" Value="CstPXSelector7" />
+                    <Prop Key="ID" Value="MCCstPXSelector7" />
                     <Prop Key="DataField" Value="UsrMailchimpListID" />
                 </PXSelector>
             </AddItem>
             <AddItem>
                 <PXTextEdit TypeFullName="PX.Web.UI.PXTextEdit">
                     <Prop Key="Virtual:ApplyStylesheetSkin" />
-                    <Prop Key="ID" Value="CstPXTextEdit4" />
+                    <Prop Key="ID" Value="MCCstPXTextEdit4" />
                     <Prop Key="DataField" Value="UsrMailchimpListStatus" />
                 </PXTextEdit>
             </AddItem>
             <AddItem>
                 <PXLayoutRule TypeFullName="PX.Web.UI.PXLayoutRule">
                     <Prop Key="Virtual:ApplyStylesheetSkin" />
-                    <Prop Key="ID" Value="CstPXLayoutRule20" />
+                    <Prop Key="ID" Value="MCCstPXLayoutRule20" />
                     <Prop Key="Merge" Value="True" />
                 </PXLayoutRule>
             </AddItem>
             <AddItem>
                 <PXNumberEdit TypeFullName="PX.Web.UI.PXNumberEdit">
                     <Prop Key="Virtual:ApplyStylesheetSkin" />
-                    <Prop Key="ID" Value="CstPXNumberEdit17" />
+                    <Prop Key="ID" Value="MCCstPXNumberEdit17" />
                     <Prop Key="DataField" Value="UsrMailchimpAverageOpenRate" />
                     <Prop Key="Width" Value="60px" />
                 </PXNumberEdit>
@@ -44,7 +44,7 @@
             <AddItem>
                 <PXNumberEdit TypeFullName="PX.Web.UI.PXNumberEdit">
                     <Prop Key="Virtual:ApplyStylesheetSkin" />
-                    <Prop Key="ID" Value="CstPXNumberEdit16" />
+                    <Prop Key="ID" Value="MCCstPXNumberEdit16" />
                     <Prop Key="DataField" Value="UsrMailchimpAverageClickRate" />
                     <Prop Key="Width" Value="60px" />
                     <Prop Key="LabelWidth" Value="120px" />
@@ -53,27 +53,27 @@
             <AddItem>
                 <PXLayoutRule TypeFullName="PX.Web.UI.PXLayoutRule">
                     <Prop Key="Virtual:ApplyStylesheetSkin" />
-                    <Prop Key="ID" Value="CstLayoutRule19" />
+                    <Prop Key="ID" Value="MCCstLayoutRule19" />
                 </PXLayoutRule>
             </AddItem>
             <AddItem>
                 <PXTextEdit TypeFullName="PX.Web.UI.PXTextEdit">
                     <Prop Key="Virtual:ApplyStylesheetSkin" />
-                    <Prop Key="ID" Value="CstPXTextEdit12" />
+                    <Prop Key="ID" Value="MCCstPXTextEdit12" />
                     <Prop Key="DataField" Value="UsrMailchimpSubscriberSource" />
                 </PXTextEdit>
             </AddItem>
             <AddItem>
                 <PXLayoutRule TypeFullName="PX.Web.UI.PXLayoutRule">
                     <Prop Key="Virtual:ApplyStylesheetSkin" />
-                    <Prop Key="ID" Value="CstPXLayoutRule22" />
+                    <Prop Key="ID" Value="MCCstPXLayoutRule22" />
                     <Prop Key="Merge" Value="True" />
                 </PXLayoutRule>
             </AddItem>
             <AddItem>
                 <PXDateTimeEdit TypeFullName="PX.Web.UI.PXDateTimeEdit">
                     <Prop Key="Virtual:ApplyStylesheetSkin" />
-                    <Prop Key="ID" Value="CstPXDateTimeEdit14" />
+                    <Prop Key="ID" Value="MCCstPXDateTimeEdit14" />
                     <Prop Key="DataField" Value="UsrMailchimpTimestampSignup" />
                     <Prop Key="LabelWidth" />
                     <Prop Key="Width" Value="100px" />
@@ -82,7 +82,7 @@
             <AddItem>
                 <PXDateTimeEdit TypeFullName="PX.Web.UI.PXDateTimeEdit">
                     <Prop Key="Virtual:ApplyStylesheetSkin" />
-                    <Prop Key="ID" Value="CstPXDateTimeEdit13" />
+                    <Prop Key="ID" Value="MCCstPXDateTimeEdit13" />
                     <Prop Key="DataField" Value="UsrMailchimpTimestampOpt" />
                     <Prop Key="Width" Value="95px" />
                     <Prop Key="LabelWidth" Value="45px" />
@@ -91,20 +91,20 @@
             <AddItem>
                 <PXLayoutRule TypeFullName="PX.Web.UI.PXLayoutRule">
                     <Prop Key="Virtual:ApplyStylesheetSkin" />
-                    <Prop Key="ID" Value="CstLayoutRule21" />
+                    <Prop Key="ID" Value="MCCstLayoutRule21" />
                 </PXLayoutRule>
             </AddItem>
             <AddItem>
                 <PXTextEdit TypeFullName="PX.Web.UI.PXTextEdit">
                     <Prop Key="Virtual:ApplyStylesheetSkin" />
-                    <Prop Key="ID" Value="CstPXTextEdit15" />
+                    <Prop Key="ID" Value="MCCstPXTextEdit15" />
                     <Prop Key="DataField" Value="UsrMailchimpUnsubscribeReason" />
                 </PXTextEdit>
             </AddItem>
             <AddItem>
                 <PXDateTimeEdit TypeFullName="PX.Web.UI.PXDateTimeEdit">
                     <Prop Key="Virtual:ApplyStylesheetSkin" />
-                    <Prop Key="ID" Value="CstPXDateTimeEdit18" />
+                    <Prop Key="ID" Value="MCCstPXDateTimeEdit18" />
                     <Prop Key="DataField" Value="UsrMailchimpMemberLastChanged" />
                 </PXDateTimeEdit>
             </AddItem>
