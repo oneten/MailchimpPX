@@ -76,7 +76,7 @@ namespace Mailchimp
             if (member != null)
             {
                 SetMailchimpStats(ext, member);
-                GetContactActivities(manager, ext);
+                GetContactActivities(manager, ext, member.ListId);
             }
 
             Base.ContactCurrent.Update(contact);
@@ -131,7 +131,7 @@ namespace Mailchimp
         }
 
 
-        public void GetContactActivities(MailchimpPXManager manager, ContactExt ext)
+        public void GetContactActivities(MailchimpPXManager manager, ContactExt ext, string listID)
         {
             EPActivityType mCActivityType = GetOrCreateMailchimpActivityType();
 
@@ -143,12 +143,12 @@ namespace Mailchimp
             DateTime? mostRecentMCDateInAC = mCActivitesInAcumatica.Last().StartDate; */
             // 2. Pull any activities from MC that are since that date (or pull them all and only insert them if they are since that date?)
 
-            CRMailchimpList list = PXSelect<CRMailchimpList,
-                Where<CRMailchimpList.listID, Equal<Required<CRMailchimpList.listID>>>>.Select(Base, ext.UsrMailchimpListID);
+            //CRMailchimpList list = PXSelect<CRMailchimpList,
+              //  Where<CRMailchimpList.listID, Equal<Required<CRMailchimpList.listID>>>>.Select(Base, ext.UsrMailchimpListID);
 
             // TODO - looks like the API might limit to 50 activities. Do we need to test that? are we worried about that?
 
-            var activities = manager.GetActivities(list.ListID, Base.Contact.Current.EMail);
+            var activities = manager.GetActivities(listID, Base.Contact.Current.EMail);
             if (activities != null)
             {
                 RegisterActivities(activities.ToList(), mCActivityType);
@@ -249,7 +249,7 @@ namespace Mailchimp
             MC.Member member = GetMemberOnList(manager, contact, ext);
 
             if (member != null)
-                GetContactActivities(manager, ext);
+                GetContactActivities(manager, ext, member.ListId);
 
             Base.ContactCurrent.Update(contact);
             Base.Save.Press();
