@@ -51,6 +51,7 @@ namespace MailchimpPXLib
             try
             {
                 member = Task.Run(async () => await manager.Members.GetAsync(listId, email_md5)).Result;
+
             }
             //catch (); // Catch the API being down and just throw and error - don't try to do anything else or change the data
             catch (AggregateException ae) when (ae.InnerException is MailChimpNotFoundException)
@@ -138,7 +139,8 @@ namespace MailchimpPXLib
             // step 1, calculate MD5 hash from input
 
             MD5 md5 = MD5.Create();
-            byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
+            // For the Mailchimp API the member id is the MD5 hash of the lowercase version of the list member's email address
+            byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input.ToLower());
             byte[] hash = md5.ComputeHash(inputBytes);
 
             // step 2, convert byte array to hex string
