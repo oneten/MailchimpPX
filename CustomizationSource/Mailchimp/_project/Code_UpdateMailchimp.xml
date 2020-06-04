@@ -25,9 +25,37 @@ namespace Mailchimp
             public const string Activity = "A";
             public const string List = "L";
         }
+
+        public static class MCConstants
+        {
+            public const string SubscribedStatus = "Subscribed";
+            public class subscribedStatus : Constant<String>
+            {
+                public subscribedStatus() : base(SubscribedStatus) { }
+            }
+
+        }
+
         [Serializable]
         public class ContactMailchimpProcessFilter : IBqlTable
         {
+            #region MailchimpList
+            public abstract class mailchimpList : IBqlField { }
+            [PXString(10)]
+            [PXSelector(typeof(Search<CRMailchimpList.listID>),
+                    SubstituteKey = typeof(CRMailchimpList.listCD))]
+            [PXUIField(DisplayName = "Pull from MailChimp List"/*, Enabled=false*/)]
+            public virtual string MailchimpList{ get; set; }
+            #endregion
+
+            #region ProcessSubscribed
+            public abstract class processSubscribed : IBqlField { }
+            [PXBool]
+            [PXDefault(true, PersistingCheck = PXPersistingCheck.Nothing)]
+            [PXUIField(DisplayName = "Process Subscribed Contacts Only")]
+            public virtual bool? ProcessSubscribed { get; set; }
+            #endregion
+
             #region Action
             public abstract class action : PX.Data.IBqlField
             {
@@ -35,8 +63,8 @@ namespace Mailchimp
             protected string _Action;
             [PXString(2)]
             [PXStringList(
-                new[] { UpdateMailchimpActions.GetAll, UpdateMailchimpActions.Status, UpdateMailchimpActions.Activity, UpdateMailchimpActions.List },
-                new[] { "Get MailChimp Data", "Update Status", "Update Activity", "Sync Lists" }
+                new[] { UpdateMailchimpActions.GetAll, UpdateMailchimpActions.List , UpdateMailchimpActions.Status, UpdateMailchimpActions.Activity},
+                new[] { "Get All MailChimp Data", "Get List Membership", "Update Membership Status", "Get Mailchimp Activities" }
             )]
             [PXUnboundDefault(UpdateMailchimpActions.GetAll)]
             public virtual string Action
@@ -66,20 +94,55 @@ namespace Mailchimp
             switch (actionID)
             {
                 // need to limit contacts to: Active, Contact Type = Person, has email address
-                case UpdateMailchimpActions.GetAll:
-                    newView = PXSelect<Contact, Where<Contact.contactType, Equal<ContactTypesAttribute.person>,
-                        And<Contact.eMail, IsNotNull,
-                        And<Contact.isActive, Equal<True>>>>>.Select(this);
+                case UpdateMailchimpActions.GetAll: // update everything -- membership, status and activities
+                    if (ProcessFilter.Current.ProcessSubscribed == true)
+                    {
+                        newView = PXSelect<Contact, Where<Contact.contactType, Equal<ContactTypesAttribute.person>,
+                            And<Contact.eMail, IsNotNull,
+                            And<ContactExt.usrMailchimpListID, IsNotNull,
+                            And<ContactExt.usrMailchimpListStatus, Equal<MCConstants.subscribedStatus>,
+                            And<Contact.isActive, Equal<True>>>>>>>.Select(this);
+                    } else
+                    {
+                        newView = PXSelect<Contact, Where<Contact.contactType, Equal<ContactTypesAttribute.person>,
+                            And<Contact.eMail, IsNotNull,
+                            And<Contact.isActive, Equal<True>>>>>.Select(this);
+                    }
                     break;
-                case UpdateMailchimpActions.List:
-                    newView = PXSelect<Contact, Where<Contact.contactType, Equal<ContactTypesAttribute.person>,
-                        And<Contact.eMail, IsNotNull,
-                        And<Contact.isActive, Equal<True>>>>>.Select(this);
+                case UpdateMailchimpActions.List: // update membership
+                    if (ProcessFilter.Current.ProcessSubscribed == true)
+                    {
+                        newView = PXSelect<Contact, Where<Contact.contactType, Equal<ContactTypesAttribute.person>,
+                            And<Contact.eMail, IsNotNull,
+                            And<ContactExt.usrMailchimpListID, IsNotNull,
+                            And<ContactExt.usrMailchimpListStatus, Equal<MCConstants.subscribedStatus>,
+                            And<Contact.isActive, Equal<True>>>>>>>.Select(this);
+                        
+                    }
+                    else
+                    {
+                        newView = PXSelect<Contact, Where<Contact.contactType, Equal<ContactTypesAttribute.person>,
+                            And<Contact.eMail, IsNotNull,
+                            And<Contact.isActive, Equal<True>>>>>.Select(this);
+                    }
                     break;
-                case UpdateMailchimpActions.Status:
-                case UpdateMailchimpActions.Activity:
+                case UpdateMailchimpActions.Status: // update status and stats
+                case UpdateMailchimpActions.Activity: // get activities
                 default:
-                    newView = PXSelect<Contact, Where<ContactExt.usrMailchimpListID, IsNotNull>>.Select(this);
+                    // if process subscribed, filter query by mailchimp id not null
+                    if (ProcessFilter.Current.ProcessSubscribed == true)
+                    {
+                        newView = PXSelect<Contact, Where<ContactExt.usrMailchimpListID, IsNotNull,
+                            And <Contact.contactType, Equal<ContactTypesAttribute.person>,
+                            And < Contact.isActive, Equal<True>,
+                            And <ContactExt.usrMailchimpListStatus, Equal<MCConstants.subscribedStatus>>>>>>.Select(this);
+                    }
+                    else
+                    {
+                        newView = PXSelect<Contact, Where<ContactExt.usrMailchimpListID, IsNotNull,
+                            And <Contact.isActive, Equal<True>,
+                            And <Contact.contactType, Equal<ContactTypesAttribute.person>>>>>.Select(this);
+                    }
                     break;
                 
 

@@ -15,7 +15,9 @@
 	<px:PXFormView ID="form" runat="server" DataSourceID="ds" DataMember="ProcessFilter" Width="100%" Height="100px" AllowAutoHide="false">
 		<Template>
 			<px:PXLayoutRule ID="PXLayoutRule1" runat="server" StartRow="True"></px:PXLayoutRule>
-			<px:PXDropDown CommitChanges="True" runat="server" ID="CstPXDropDown1" DataField="Action" ></px:PXDropDown></Template>
+			<px:PXDropDown CommitChanges="True" runat="server" ID="CstPXDropDown1" DataField="Action" ></px:PXDropDown>
+			<px:PXSelector runat="server" ID="CstPXSelector2" DataField="MailchimpList" ></px:PXSelector>
+			<px:PXCheckBox CommitChanges="True" runat="server" ID="CstPXCheckBox3" DataField="ProcessSubscribed" ></px:PXCheckBox></Template>
 	</px:PXFormView>
 </asp:Content>
 <asp:Content ID="cont3" ContentPlaceHolderID="phG" Runat="Server">
@@ -27,6 +29,7 @@
 				<px:PXGridColumn DataField="ContactID" Width="70" ></px:PXGridColumn>
 				<px:PXGridColumn DataField="DisplayName" Width="280" ></px:PXGridColumn>
 				<px:PXGridColumn Type="CheckBox" DataField="IsActive" Width="60" ></px:PXGridColumn>
+				<px:PXGridColumn DataField="ContactType" Width="70" />
 				<px:PXGridColumn DataField="BAccountID" Width="140" ></px:PXGridColumn>
 				<px:PXGridColumn DataField="EMail" Width="280" ></px:PXGridColumn>
 				<px:PXGridColumn DataField="UsrMailchimpListStatus" Width="140" ></px:PXGridColumn>
