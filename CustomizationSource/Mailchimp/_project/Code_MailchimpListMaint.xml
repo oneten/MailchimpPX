@@ -40,6 +40,8 @@ namespace Mailchimp
 
             // TODO: Sometimes get error "API key cannot be empty" - refreshing and trying again solves it, but not sure what's going on here
 
+            // TODO: if you swtich mailchimp accounts (use a new API), this code doesn't clear out the lists from the old api. Is that a problem?
+
             var existingLists = PXSelect<CRMailchimpList>.Select(this).ToList();
             CRMailchimpList acumaticaList;
 

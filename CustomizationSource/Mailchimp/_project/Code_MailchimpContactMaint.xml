@@ -64,7 +64,7 @@ namespace Mailchimp
             }
         }
 
-        public void GetMailchimpData(Contact contact)
+        public void GetMailchimpData(Contact contact, string listID = "")
         {
             Base.ContactCurrent.Current = contact;
             if (contact == null) return;
@@ -72,7 +72,7 @@ namespace Mailchimp
             ContactExt ext = contact.GetExtension<ContactExt>();
             var manager = GetManager();
 
-            MC.Member member = GetMemberOnList(manager, contact, ext);
+            MC.Member member = GetMemberOnList(manager, contact, ext, listID);
             if (member != null)
             {
                 SetMailchimpStats(ext, member);
@@ -85,32 +85,42 @@ namespace Mailchimp
         #endregion
 
 
-        public MC.Member GetMemberOnList(MailchimpPXManager manager, Contact contact, ContactExt ext)
+        public MC.Member GetMemberOnList(MailchimpPXManager manager, Contact contact, ContactExt ext, string listID)
         {
             MC.Member member = null;
             bool onList = false;
 
-            foreach (var mailchimpList in manager.GetLists())
+            if (!String.IsNullOrEmpty(listID)) // Just check membership on a single list
             {
-                // see if the contact is on that list
-                // if yes: save list on contact, then break (don't worry about checking the other lists if you've already found a match)
-                try
-                {
-                    member = manager.GetMember(mailchimpList.Id, contact.EMail);
-                    ext.UsrMailchimpListID = mailchimpList.Id;
-                    onList = true;
-                    break;
-                }
-                catch (MemberDoesNotExistException)
-                {
-                    // if the user doesn't exist on this MC list, don't throw an exception yet. Continue to try the next list and only throw exception if not on any list. 
-                }
-            }
+                member = manager.GetMember(listID, contact.EMail);
+                ext.UsrMailchimpListID = listID;
 
-            // If not any list, return a message to the user
-            if (onList == false)
-            {
-                throw new MemberDoesNotExistException();
+            } else { // check all lists for membership
+
+                // pulling from all lists that Mailchimp returns
+                foreach (var mailchimpList in manager.GetLists())
+                {
+                    // see if the contact is on that list
+                    // if yes: save list on contact, then break (don't worry about checking the other lists if you've already found a match)
+                    try
+                    {
+                        member = manager.GetMember(mailchimpList.Id, contact.EMail);
+                        ext.UsrMailchimpListID = mailchimpList.Id;
+                        onList = true;
+                        break;
+                    }
+                    catch (MemberDoesNotExistException)
+                    {
+                        // if the user doesn't exist on this MC list, don't throw an exception yet. Continue to try the next list and only throw exception if not on any list. 
+                    }
+                }
+
+                // If not any list, return a message to the user
+                if (onList == false)
+                {
+                    throw new MemberDoesNotExistException();
+                }
+
             }
 
             return member;
@@ -177,14 +187,14 @@ namespace Mailchimp
         }
 
         // Check mailchimp to see if the contact is on a list and if so, update their MC list in Acumatica
-        public MC.Member GetListMembership(Contact contact)
+        public MC.Member GetListMembership(Contact contact, string listID = "")
         {
             Base.ContactCurrent.Current = contact;
             if (contact == null) return null;
             ContactExt ext = contact.GetExtension<ContactExt>();
 
             var manager = GetManager();
-            MC.Member member = GetMemberOnList(manager, contact, ext);           
+            MC.Member member = GetMemberOnList(manager, contact, ext, listID);           
 
             Base.ContactCurrent.Update(contact);
             Base.Save.Press();
@@ -194,7 +204,7 @@ namespace Mailchimp
         #endregion
 
         #region UpdateSubscriptionStatus 
-        public void UpdateMailchimpStatus(Contact contact)
+        public void UpdateMailchimpStatus(Contact contact, string listID = "")
         {
             Base.ContactCurrent.Current = contact;
             if (contact == null) return;
@@ -202,7 +212,7 @@ namespace Mailchimp
             ContactExt ext = contact.GetExtension<ContactExt>();
             var manager = GetManager();
 
-            MC.Member member = GetMemberOnList(manager, contact, ext);
+            MC.Member member = GetMemberOnList(manager, contact, ext, listID);
 
             if (member != null)
                 SetMailchimpStats(ext, member);
@@ -237,7 +247,7 @@ namespace Mailchimp
 
         List<MC.Activity> activityList = new List<MC.Activity>();
 
-        public void UpdateMailchimpActivities(Contact contact)
+        public void UpdateMailchimpActivities(Contact contact, string listID = "")
         {
 
             Base.ContactCurrent.Current = contact;
@@ -246,7 +256,7 @@ namespace Mailchimp
             ContactExt ext = contact.GetExtension<ContactExt>();
             var manager = GetManager();
 
-            MC.Member member = GetMemberOnList(manager, contact, ext);
+            MC.Member member = GetMemberOnList(manager, contact, ext, listID);
 
             if (member != null)
                 GetContactActivities(manager, ext, member.ListId);

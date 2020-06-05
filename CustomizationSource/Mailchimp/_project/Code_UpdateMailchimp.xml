@@ -44,7 +44,7 @@ namespace Mailchimp
             [PXString(10)]
             [PXSelector(typeof(Search<CRMailchimpList.listID>),
                     SubstituteKey = typeof(CRMailchimpList.listCD))]
-            [PXUIField(DisplayName = "Pull from MailChimp List"/*, Enabled=false*/)]
+            [PXUIField(DisplayName = "MailChimp List (leave blank to pull all lists)"/*, Enabled=false*/)]
             public virtual string MailchimpList{ get; set; }
             #endregion
 
@@ -153,21 +153,22 @@ namespace Mailchimp
         public virtual void ContactMailchimpProcessFilter_RowSelected(PXCache sender, PXRowSelectedEventArgs e)
         {
             ContactMailchimpProcessFilter filter = e.Row as ContactMailchimpProcessFilter;
+
             if (filter != null && !String.IsNullOrEmpty(filter.Action))
             {               
                 switch(filter.Action)
                 {
                     case UpdateMailchimpActions.GetAll:
-                        Contacts.SetProcessDelegate(list => ProcessGetMailchimpData(list));
+                        Contacts.SetProcessDelegate(list => ProcessGetMailchimpData(list, filter.MailchimpList));
                         break;
                     case UpdateMailchimpActions.Status:
-                        Contacts.SetProcessDelegate( list => ProcessUpdateMailchimpStatuses(list));
+                        Contacts.SetProcessDelegate( list => ProcessUpdateMailchimpStatuses(list, filter.MailchimpList));
                         break;
                     case UpdateMailchimpActions.Activity:
-                        Contacts.SetProcessDelegate(list => ProcessSyncMailchimpActivities(list));
+                        Contacts.SetProcessDelegate(list => ProcessSyncMailchimpActivities(list, filter.MailchimpList));
                         break;
                     case UpdateMailchimpActions.List:
-                        Contacts.SetProcessDelegate(list => ProcessSyncMailchimpLists(list));
+                        Contacts.SetProcessDelegate(list => ProcessSyncMailchimpLists(list, filter.MailchimpList));
                         break;
                     default:
                         throw new PXException(PX.Objects.Common.Messages.IncorrectActionSpecified); // TODO - what should this exception be?
@@ -175,7 +176,7 @@ namespace Mailchimp
             }
         }
 
-        public static void ProcessGetMailchimpData(List<Contact> contacts)
+        public static void ProcessGetMailchimpData(List<Contact> contacts, string selectedListID)
         {
             var graph = PXGraph.CreateInstance<ContactMaint>();
             bool errorOccurred = false;
@@ -186,7 +187,7 @@ namespace Mailchimp
                 graph.Clear(); // make sure to clear any errors etc. from previous contact
                 try
                 {
-                    graphExt.GetMailchimpData(contact);
+                    graphExt.GetMailchimpData(contact, selectedListID);
                     string message = String.Format("Contact {0} has been updated.", contact.DisplayName);
                     PXProcessing.SetInfo(contacts.IndexOf(contact), message);
                 }
@@ -218,7 +219,7 @@ namespace Mailchimp
 
         }
 
-        public static void ProcessSyncMailchimpLists(List<Contact> contacts)
+        public static void ProcessSyncMailchimpLists(List<Contact> contacts, string selectedListID)
         {
             var graph = PXGraph.CreateInstance<ContactMaint>();
             bool errorOccurred = false;
@@ -229,7 +230,7 @@ namespace Mailchimp
             {
                 try
                 {
-                    graphExt.GetListMembership(contact);
+                    graphExt.GetListMembership(contact, selectedListID);
 
                     string message = String.Format("Contact {0} has been updated.", contact.DisplayName);
                     PXProcessing.SetInfo(contacts.IndexOf(contact), message);
@@ -263,7 +264,7 @@ namespace Mailchimp
 
         }
 
-        public static void ProcessSyncMailchimpActivities(List<Contact> contacts)
+        public static void ProcessSyncMailchimpActivities(List<Contact> contacts, string selectedListID)
         {
             var graph = PXGraph.CreateInstance<ContactMaint>();
             bool errorOccurred = false;
@@ -274,7 +275,7 @@ namespace Mailchimp
             {
                 try
                 {
-                    graphExt.UpdateMailchimpActivities(contact);
+                    graphExt.UpdateMailchimpActivities(contact, selectedListID);
 
                     string message = String.Format("Contact {0} has been updated.", contact.DisplayName);
                     PXProcessing.SetInfo(contacts.IndexOf(contact), message);
@@ -307,7 +308,7 @@ namespace Mailchimp
                 throw new PXException("At least one contact hasn't been processed.");
         }
         
-        public static void ProcessUpdateMailchimpStatuses(List<Contact> contacts)
+        public static void ProcessUpdateMailchimpStatuses(List<Contact> contacts, string selectedListID)
         {
             var graph = PXGraph.CreateInstance<ContactMaint>();
             bool errorOccurred = false;
@@ -318,7 +319,7 @@ namespace Mailchimp
             {
                 try
                 {
-                    graphExt.UpdateMailchimpStatus(contact);
+                    graphExt.UpdateMailchimpStatus(contact, selectedListID);
 
                     string message = String.Format("Contact {0} has been updated.", contact.DisplayName);
                     PXProcessing.SetInfo(contacts.IndexOf(contact), message);
