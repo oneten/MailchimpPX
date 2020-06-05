@@ -223,7 +223,7 @@ namespace Mailchimp
  
         public PXAction<Contact> syncMailchimpStatus;
         [PXProcessButton]
-        [PXUIField(DisplayName = "Sync Mailchimp")]
+        [PXUIField(DisplayName = "Update Mailchimp Status")]
         protected virtual IEnumerable SyncMailchimpStatus(PXAdapter adapter)
         {
             foreach (Contact contact in adapter.Get())
@@ -267,7 +267,7 @@ namespace Mailchimp
 
         public PXAction<Contact> syncMailchimpActivities;
         [PXButton(CommitChanges = true)]
-        [PXUIField(DisplayName = "Sync MC Activities")]
+        [PXUIField(DisplayName = "Get Mailchimp Activities")]
         protected virtual IEnumerable SyncMailchimpActivities(PXAdapter adapter)
         {
             foreach (Contact contact in adapter.Get())
@@ -418,7 +418,7 @@ namespace Mailchimp
         // NB: This is a development tool that should be commented out before putting on production -- having the ability to delete and re-pull MC activities will help with testing/development
         public PXAction<Contact> clearMailchimpData;
         [PXButton(CommitChanges = true)]
-        [PXUIField(DisplayName = "Clear MC Data")]
+        [PXUIField(DisplayName = "Clear Mailchimp Data")]
         protected void ClearMailchimpData()
         {
             Contact contact = Base.ContactCurrent.Current;

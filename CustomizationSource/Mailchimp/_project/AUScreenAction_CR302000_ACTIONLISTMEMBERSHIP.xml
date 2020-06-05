@@ -1,0 +1,3 @@
+﻿<AUScreenAction ScreenID="CR302000" ActionName="ActionListMembership" DataMember="PX.Objects.CR.Contact" MenuFolder="" MenuFolderType="" ActionFolderType="" IsTopLevel="False">
+    <Prop Name="IsVisible" DisplayName="Visible" IsCustomized="True" Value="False" />
+</AUScreenAction>
