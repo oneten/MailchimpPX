@@ -6,7 +6,7 @@ namespace MailchimpPXLib
     [Serializable]
     public class MemberDoesNotExistException : Exception
     {
-        public MemberDoesNotExistException() : base("Mailchimp member does not exist on any list.")
+        public MemberDoesNotExistException() : base("Mailchimp member does not exist on list.")
         {
         }
 
