@@ -90,6 +90,14 @@ namespace Mailchimp
     public virtual DateTime? UsrMailchimpTimestampSignup { get; set; }
     public abstract class usrMailchimpTimestampSignup : PX.Data.BQL.BqlDateTime.Field<usrMailchimpTimestampSignup> { }
     #endregion
+      
+    #region UsrMailchimpMembershipLastChecked
+    [PXDBDate(PreserveTime = true, InputMask = "g")]
+    [PXUIField(DisplayName="Mailchimp Membership Last Checked", Enabled=false)]
+      
+    public virtual DateTime? UsrMailchimpMembershipLastChecked { get; set; }
+    public abstract class usrMailchimpMembershipLastChecked : PX.Data.BQL.BqlDateTime.Field<usrMailchimpMembershipLastChecked> { }
+    #endregion
   }
 }]]></CDATA>
 </Graph>

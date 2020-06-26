@@ -1,3 +1,1 @@
-﻿<AUScreenAction ScreenID="CR302000" ActionName="ClearMailchimpData" DataMember="PX.Objects.CR.Contact" MenuFolder="" MenuFolderType="" ActionFolderType="" IsTopLevel="False">
-    <Prop Name="IsVisible" DisplayName="Visible" IsCustomized="True" Value="False" />
-</AUScreenAction>
+﻿<AUScreenAction ScreenID="CR302000" ActionName="ClearMailchimpData" DataMember="PX.Objects.CR.Contact" MenuFolder="Action" MenuFolderType="ActionsFolder" ActionFolderType="" IsTopLevel="False" Before="ConvertToBAccount" />

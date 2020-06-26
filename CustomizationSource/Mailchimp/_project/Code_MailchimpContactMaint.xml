@@ -89,6 +89,7 @@ namespace Mailchimp
         {
             MC.Member member = null;
             bool onList = false;
+            ext.UsrMailchimpMembershipLastChecked = Base.Accessinfo.BusinessDate.Value.Date + PXTimeZoneInfo.Now.TimeOfDay;
 
             if (!String.IsNullOrEmpty(listID)) // Just check membership on a single list
             {
@@ -96,7 +97,7 @@ namespace Mailchimp
                 ext.UsrMailchimpListID = listID;
 
             } else { // check all lists for membership
-
+                
                 // pulling from all lists that Mailchimp returns
                 foreach (var mailchimpList in manager.GetLists())
                 {
@@ -118,6 +119,9 @@ namespace Mailchimp
                 // If not any list, return a message to the user
                 if (onList == false)
                 {
+                    // Save before the exception since we want to update the MailchimpMembershipLastChecked date and an would prevent save
+                    Base.ContactCurrent.Update(contact);
+                    Base.Save.Press();
                     throw new MemberDoesNotExistException();
                 }
 

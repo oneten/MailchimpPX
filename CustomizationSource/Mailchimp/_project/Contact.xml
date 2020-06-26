@@ -8,4 +8,5 @@
     <Column TableName="Contact" ColumnName="UsrMailchimpUnsubscribeReason" ColumnType="string" AllowNull="True" MaxLength="100" DecimalPrecision="2" DecimalLength="100" IsNewColumn="True" IsUnicode="True" />
     <Column TableName="Contact" ColumnName="UsrMailchimpTimestampOpt" ColumnType="date" AllowNull="True" MaxLength="25" DecimalPrecision="2" IsNewColumn="True" IsUnicode="True" />
     <Column TableName="Contact" ColumnName="UsrMailchimpTimestampSignup" ColumnType="date" AllowNull="True" MaxLength="25" DecimalPrecision="2" IsNewColumn="True" IsUnicode="True" />
+    <Column TableName="Contact" ColumnName="UsrMailchimpMembershipLastChecked" ColumnType="date" AllowNull="True" MaxLength="25" DecimalPrecision="2" IsNewColumn="True" IsUnicode="True" />
 </Table>
