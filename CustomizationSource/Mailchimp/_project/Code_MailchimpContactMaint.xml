@@ -93,8 +93,18 @@ namespace Mailchimp
 
             if (!String.IsNullOrEmpty(listID)) // Just check membership on a single list
             {
-                member = manager.GetMember(listID, contact.EMail);
-                ext.UsrMailchimpListID = listID;
+                try
+                {
+                    member = manager.GetMember(listID, contact.EMail);
+                    ext.UsrMailchimpListID = listID;
+                }
+                catch (MemberDoesNotExistException)
+                {
+                    // Save before the exception since we want to update the MailchimpMembershipLastChecked date and an would prevent save
+                    Base.ContactCurrent.Update(contact);
+                    Base.Save.Press();
+                    throw new MemberDoesNotExistException();
+                }
 
             } else { // check all lists for membership
                 
