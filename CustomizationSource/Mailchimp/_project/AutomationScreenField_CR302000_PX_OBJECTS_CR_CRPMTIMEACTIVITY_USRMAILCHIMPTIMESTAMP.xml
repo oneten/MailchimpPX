@@ -1,3 +1,0 @@
-﻿<AutomationScreenField ScreenID="CR302000" TableName="PX.OBJECTS.CR.CRPMTIMEACTIVITY" FieldName="USRMAILCHIMPTIMESTAMP" IsUserDefinedField="False">
-    <Prop Name="IsVisible" DisplayName="Visible" IsCustomized="True" Value="False" />
-</AutomationScreenField>

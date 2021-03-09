@@ -1,1 +1,0 @@
-﻿<AUScreenAction ScreenID="CR302000" ActionName="ClearMailchimpData" DataMember="PX.Objects.CR.Contact" MenuFolder="Action" MenuFolderType="ActionsFolder" ActionFolderType="" IsTopLevel="False" Before="ConvertToBAccount" />

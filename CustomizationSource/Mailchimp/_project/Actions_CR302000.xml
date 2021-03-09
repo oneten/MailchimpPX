@@ -1,0 +1,22 @@
+﻿<Actions ScreenID="CR302000">
+    <Action IsActive="True" ActionName="ActionGetMailchimpData" ActionType="G" Before="ClearMailchimpData" BatchMode="False" MenuFolderType="19" WindowMode="S" DisablePersist="False">
+        <StateActionFields />
+        <StateActionParams />
+    </Action>
+    <Action IsActive="True" ActionName="ActionListMembership" ActionType="G" BatchMode="False" WindowMode="S" HideCondition="True" DisablePersist="False">
+        <StateActionFields />
+        <StateActionParams />
+    </Action>
+    <Action IsActive="True" ActionName="ClearMailchimpData" ActionType="G" Before="ConvertToBAccount" BatchMode="False" MenuFolderType="19" WindowMode="S" DisablePersist="False">
+        <StateActionFields />
+        <StateActionParams />
+    </Action>
+    <Action IsActive="True" ActionName="SyncMailchimpActivities" ActionType="G" BatchMode="False" WindowMode="S" HideCondition="True" DisablePersist="False">
+        <StateActionFields />
+        <StateActionParams />
+    </Action>
+    <Action IsActive="True" ActionName="SyncMailchimpStatus" ActionType="G" BatchMode="False" WindowMode="S" HideCondition="True" DisablePersist="False">
+        <StateActionFields />
+        <StateActionParams />
+    </Action>
+</Actions>

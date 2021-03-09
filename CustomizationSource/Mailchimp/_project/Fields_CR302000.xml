@@ -1,0 +1,6 @@
+﻿<Fields ScreenID="CR302000">
+    <Field IsActive="True" FieldName="USRMAILCHIMPACTION" HideCondition="True" ObjectName="PX.OBJECTS.CR.CRPMTIMEACTIVITY" />
+    <Field IsActive="True" FieldName="USRMAILCHIMPCAMPAIGNID" HideCondition="True" ObjectName="PX.OBJECTS.CR.CRPMTIMEACTIVITY" />
+    <Field IsActive="True" FieldName="USRMAILCHIMPCLICKURL" HideCondition="True" ObjectName="PX.OBJECTS.CR.CRPMTIMEACTIVITY" />
+    <Field IsActive="True" FieldName="USRMAILCHIMPTIMESTAMP" HideCondition="True" ObjectName="PX.OBJECTS.CR.CRPMTIMEACTIVITY" />
+</Fields>
