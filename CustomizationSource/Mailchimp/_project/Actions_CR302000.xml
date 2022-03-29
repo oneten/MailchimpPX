@@ -1,5 +1,5 @@
 ﻿<Actions ScreenID="CR302000">
-    <Action IsActive="True" ActionName="ActionGetMailchimpData" ActionType="G" Before="ClearMailchimpData" BatchMode="False" MenuFolderType="19" WindowMode="S" DisablePersist="False">
+    <Action IsActive="True" ActionName="ActionGetMailchimpData" ActionType="G" Before="ClearMailchimpData" BatchMode="False" MenuFolderType="Action" WindowMode="S" DisablePersist="False">
         <StateActionFields />
         <StateActionParams />
     </Action>
@@ -7,7 +7,7 @@
         <StateActionFields />
         <StateActionParams />
     </Action>
-    <Action IsActive="True" ActionName="ClearMailchimpData" ActionType="G" Before="ConvertToBAccount" BatchMode="False" MenuFolderType="19" WindowMode="S" DisablePersist="False">
+    <Action IsActive="True" ActionName="ClearMailchimpData" ActionType="G" Before="ConvertToBAccount" BatchMode="False" MenuFolderType="Action" WindowMode="S" DisablePersist="False">
         <StateActionFields />
         <StateActionParams />
     </Action>
@@ -19,4 +19,58 @@
         <StateActionFields />
         <StateActionParams />
     </Action>
+    <Action IsActive="True" IsSystem="True" IsCustomized="False" IsCustomizedRecursive="False" ActionName="addOpportunity" ActionType="G" After="Last" BatchMode="False" MenuFolderType="RecordCreation" WindowMode="S" ExposedToMobile="False">
+        <StateActionFields />
+        <StateActionParams />
+    </Action>
+    <Action IsActive="True" IsSystem="True" IsCustomized="False" IsCustomizedRecursive="False" ActionName="CreateBAccount" ActionType="G" After="addOpportunity" BatchMode="False" MenuFolderType="RecordCreation" WindowMode="S" ExposedToMobile="False">
+        <StateActionFields />
+        <StateActionParams />
+    </Action>
+    <Action IsActive="True" IsSystem="True" IsCustomized="False" IsCustomizedRecursive="False" ActionName="addCase" ActionType="G" After="CreateBAccount" BatchMode="False" MenuFolderType="RecordCreation" WindowMode="S" ExposedToMobile="False">
+        <StateActionFields />
+        <StateActionParams />
+    </Action>
+    <Action IsActive="True" IsSystem="True" IsCustomized="False" IsCustomizedRecursive="False" ActionName="CreateLead" ActionType="G" After="addCase" DisableCondition="2a6360c1-814f-92de-a80e-84bc9de5b057" BatchMode="False" MenuFolderType="RecordCreation" WindowMode="S" ExposedToMobile="False">
+        <StateActionFields />
+        <StateActionParams />
+    </Action>
+    <Action IsActive="True" IsSystem="True" IsCustomized="False" IsCustomizedRecursive="False" ActionName="NewActivityP_Workflow" ActionType="G" After="CreateLead" BatchMode="False" MenuFolderType="Activities" WindowMode="S" ExposedToMobile="False">
+        <StateActionFields />
+        <StateActionParams />
+    </Action>
+    <Action IsActive="True" IsSystem="True" IsCustomized="False" IsCustomizedRecursive="False" ActionName="NewActivityN_Workflow" ActionType="G" After="NewActivityP_Workflow" BatchMode="False" MenuFolderType="Activities" WindowMode="S" ExposedToMobile="False">
+        <StateActionFields />
+        <StateActionParams />
+    </Action>
+    <Action IsActive="True" IsSystem="True" IsCustomized="False" IsCustomizedRecursive="False" ActionName="NewMailActivity_Workflow" ActionType="G" After="NewActivityN_Workflow" BatchMode="False" MenuFolderType="Activities" WindowMode="S" ExposedToMobile="False">
+        <StateActionFields />
+        <StateActionParams />
+    </Action>
+    <Action IsActive="True" IsSystem="True" IsCustomized="False" IsCustomizedRecursive="False" ActionName="NewTask_Workflow" ActionType="G" After="NewMailActivity_Workflow" BatchMode="False" MenuFolderType="Activities" WindowMode="S" ExposedToMobile="False">
+        <StateActionFields />
+        <StateActionParams />
+    </Action>
+    <Action IsActive="True" IsSystem="True" IsCustomized="False" IsCustomizedRecursive="False" ActionName="CheckForDuplicates" ActionType="G" After="NewTask_Workflow" BatchMode="False" MenuFolderType="Validation" WindowMode="S" ExposedToMobile="False">
+        <StateActionFields />
+        <StateActionParams />
+    </Action>
+    <Action IsActive="True" IsSystem="True" IsCustomized="False" IsCustomizedRecursive="False" ActionName="MarkAsValidated" ActionType="G" After="CheckForDuplicates" BatchMode="False" MenuFolderType="Validation" WindowMode="S" ExposedToMobile="False">
+        <StateActionFields />
+        <StateActionParams />
+    </Action>
+    <Action IsActive="True" IsSystem="True" IsCustomized="False" IsCustomizedRecursive="False" ActionName="CloseAsDuplicate" ActionType="G" After="MarkAsValidated" BatchMode="False" MenuFolderType="Validation" WindowMode="S" ExposedToMobile="False">
+        <StateActionFields />
+        <StateActionParams />
+    </Action>
+    <Action IsActive="True" IsSystem="True" IsCustomized="False" IsCustomizedRecursive="False" ActionName="ValidateAddress" ActionType="G" After="CloseAsDuplicate" BatchMode="False" MenuFolderType="Validation" WindowMode="S" ExposedToMobile="False">
+        <StateActionFields />
+        <StateActionParams />
+    </Action>
+    <Category IsActive="True" IsSystem="True" IsCustomized="False" IsCustomizedRecursive="False" DisplayName="Actions" CategoryName="Action" LineNbr="0" />
+    <Category IsActive="True" IsSystem="True" IsCustomized="False" IsCustomizedRecursive="False" DisplayName="Inquiries" CategoryName="Inquiry" After="Action" LineNbr="1" />
+    <Category IsActive="True" IsSystem="True" IsCustomized="False" IsCustomizedRecursive="False" DisplayName="Reports" CategoryName="Report" After="Inquiry" LineNbr="2" />
+    <Category IsActive="True" IsSystem="True" IsCustomized="False" IsCustomizedRecursive="False" DisplayName="Record Creation" CategoryName="RecordCreation" After="Report" />
+    <Category IsActive="True" IsSystem="True" IsCustomized="False" IsCustomizedRecursive="False" DisplayName="Validation" CategoryName="Validation" After="RecordCreation" />
+    <Category IsActive="True" IsSystem="True" IsCustomized="False" IsCustomizedRecursive="False" DisplayName="Activities" CategoryName="Activities" After="Validation" />
 </Actions>
