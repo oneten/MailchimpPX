@@ -30,9 +30,10 @@
 				<px:PXGridColumn DataField="DisplayName" Width="280" ></px:PXGridColumn>
 				<px:PXGridColumn Type="CheckBox" DataField="IsActive" Width="60" ></px:PXGridColumn>
 				<px:PXGridColumn DataField="ContactType" Width="70" ></px:PXGridColumn>
+				<px:PXGridColumn DataField="ClassID" Width="120" ></px:PXGridColumn>
 				<px:PXGridColumn DataField="BAccountID" Width="140" ></px:PXGridColumn>
 				<px:PXGridColumn DataField="EMail" Width="280" ></px:PXGridColumn>
-				<px:PXGridColumn DataField="UsrMailchimpMembershipLastChecked" Width="90" />
+				<px:PXGridColumn DataField="UsrMailchimpMembershipLastChecked" Width="90" ></px:PXGridColumn>
 				<px:PXGridColumn DataField="UsrMailchimpListStatus" Width="140" ></px:PXGridColumn>
 				<px:PXGridColumn DataField="UsrMailchimpListID" Width="120" ></px:PXGridColumn></Columns>
 			</px:PXGridLevel>
