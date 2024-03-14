@@ -20,7 +20,7 @@ See your Mailchimp data right alongside your Acumatica data! No more wondering a
 3) Run BuildCustomization.bat to get a customization zip file to install.
 4) Update the Web.Config in Acumatica to use it's version of Newtonsoft.Json:
    Under `<configuration>` -> `<runtime>` -> `<dependantAssembly>` for Newstonsoft.Json, updating
-   `<bindingRedirect oldVersion="0.0.0.0-9.0.0.0" ...>` to "0.0.0.0-10.0.0.0"
+   `<bindingRedirect oldVersion="0.0.0.0-12.0.0.0" ...>` to "0.0.0.0-13.0.0.0"
 5) Upload and publish Mailchimp.zip
 
 ### Connect to Mailchimp instance

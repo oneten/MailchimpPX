@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.329
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34408.163
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "MailchimpPX", "http://localhost/MailchimpPX", "{E060E84E-611D-4EF3-A4ED-ED4648766ED9}"
 	ProjectSection(WebsiteProperties) = preProject
@@ -26,6 +26,27 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "MailchimpPX", "http://local
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MailChimpPXLib", "MailChimpPXLib\MailChimpPXLib.csproj", "{D5597B2B-13E6-43A1-B1F3-6B44772FEB87}"
 EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Dev22", "http://localhost/Dev22", "{ABEB43BC-DB22-4922-8CA8-25C594611EFC}"
+	ProjectSection(WebsiteProperties) = preProject
+		UseIISExpress = "false"
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.8"
+		Debug.AspNetCompiler.VirtualPath = "/Dev22"
+		Debug.AspNetCompiler.PhysicalPath = "Site\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\Dev22\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/Dev22"
+		Release.AspNetCompiler.PhysicalPath = "Site\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\Dev22\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		SlnRelativePath = "Site\"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,6 +61,10 @@ Global
 		{D5597B2B-13E6-43A1-B1F3-6B44772FEB87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D5597B2B-13E6-43A1-B1F3-6B44772FEB87}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D5597B2B-13E6-43A1-B1F3-6B44772FEB87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABEB43BC-DB22-4922-8CA8-25C594611EFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABEB43BC-DB22-4922-8CA8-25C594611EFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABEB43BC-DB22-4922-8CA8-25C594611EFC}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABEB43BC-DB22-4922-8CA8-25C594611EFC}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
