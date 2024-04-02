@@ -14,6 +14,7 @@ using PX.Objects.CA;
 using System.Collections.Generic;
 using PX.Objects;
 using PX.Objects.CR;
+using PX.Objects.CR.BusinessAccountMaint_Extensions;
 
 namespace Mailchimp
 {
@@ -22,7 +23,7 @@ namespace Mailchimp
         public override void Initialize()
         {
             // Sort by StartDate (default is CreatedDateTime) so Mailchimp Activities are in sequence with pre-existing Acumatica Activites
-            Base.Activities.OrderByNew<OrderBy<Desc<CRActivity.startDate>>>(); 
+            Base.GetExtension<BusinessAccountMaint_ActivityDetailsExt>().Activities.OrderByNew<OrderBy<Desc<CRActivity.startDate>>>(); // Base.Activities.OrderByNew<OrderBy<Desc<CRActivity.startDate>>>(); 
         }
     
     #region Event Handlers

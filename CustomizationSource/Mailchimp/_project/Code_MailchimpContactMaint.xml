@@ -18,6 +18,7 @@ using PX.Objects;
 using PX.Objects.CR;
 using MailchimpPXLib;
 using MC = MailChimp.Net.Models;
+using PX.Objects.CR.ContactMaint_Extensions;
 
 namespace Mailchimp
 {
@@ -29,7 +30,8 @@ namespace Mailchimp
         public override void Initialize()
         {
             // Sort by StartDate (default is CreatedDateTime) so Mailchimp Activities are in sequence with pre-existing Acumatica Activites
-            Base.Activities.OrderByNew<OrderBy<Desc<CRActivity.startDate>>>(); 
+            // Base.Activities.OrderByNew<OrderBy<Desc<CRActivity.startDate>>>();
+            Base.GetExtension<ContactMaint_ActivityDetailsExt>().Activities.OrderByNew<OrderBy<Desc<CRActivity.startDate>>>(); 
         }
 
 
@@ -336,10 +338,9 @@ namespace Mailchimp
             TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
             string titleCasedAction = textInfo.ToTitleCase(activity.Action.ToLower());
 
-            foreach (CRActivity acumaticaActivity in Base.Activities.Select()) 
+            foreach (CRActivity acumaticaActivity in Base.GetExtension<ContactMaint_ActivityDetailsExt>().Activities.Select()) 
             {
                 CRActivityExt acumaticaActivityExt = acumaticaActivity.GetExtension<CRActivityExt>();
-
                 // If it's a MailChimp type activity and the timestamp and action match, assume it's the same activity and has already been pulled into Acumatica
                 if (acumaticaActivity.Type == mCActivityType.Type && activity.Timestamp == acumaticaActivityExt.UsrMailchimpTimestamp && titleCasedAction == acumaticaActivityExt.UsrMailchimpAction)
                     return true; // activity already exists in Acumatica
@@ -423,10 +424,11 @@ namespace Mailchimp
         {
             EPActivityType mCActivityType = GetOrCreateMailchimpActivityType();
 
-            foreach (CRPMTimeActivity acumaticaActivity in Base.Activities.Select().RowCast<CRPMTimeActivity>().Where(ac => ac.Type == mCActivityType.Type))
-            {
-                Base.Activities.Delete(acumaticaActivity);
-            }
+            foreach (CRPMTimeActivity acumaticaActivity in Base.GetExtension<ContactMaint_ActivityDetailsExt>().Activities.Select().RowCast<CRPMTimeActivity>().Where(ac => ac.Type == mCActivityType.Type))
+             {
+                 Base.GetExtension<ContactMaint_ActivityDetailsExt>().Activities.Delete(acumaticaActivity);
+
+             }
         }
 
         // NB: This is a development tool that should be commented out before putting on production -- having the ability to delete and re-pull MC activities will help with testing/development

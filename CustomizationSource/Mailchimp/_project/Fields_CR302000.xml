@@ -3,4 +3,5 @@
     <Field IsActive="True" FieldName="USRMAILCHIMPCAMPAIGNID" HideCondition="True" ObjectName="PX.OBJECTS.CR.CRPMTIMEACTIVITY" />
     <Field IsActive="True" FieldName="USRMAILCHIMPCLICKURL" HideCondition="True" ObjectName="PX.OBJECTS.CR.CRPMTIMEACTIVITY" />
     <Field IsActive="True" FieldName="USRMAILCHIMPTIMESTAMP" HideCondition="True" ObjectName="PX.OBJECTS.CR.CRPMTIMEACTIVITY" />
+    <Field IsActive="True" IsSystem="True" IsCustomized="False" IsCustomizedRecursive="False" FieldName="RESOLUTION" ObjectName="PX.Objects.CR.Contact" ComboBoxValues="Set|AS|Assign;Set|CA|Abandoned;Set|CD|Duplicate;Set|CL|Unable to contact;Set|CU|Unknown;Set|EX|External;Set|IN|In Process;Set|OU|Nurture;Set|RJ|Disqualified" IsFromSchema="False" />
 </Fields>

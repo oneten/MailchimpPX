@@ -26,7 +26,8 @@ namespace Mailchimp
         public override void Initialize()
         {
             // Sort by StartDate (default is CreatedDateTime) so Mailchimp Activities are in sequence with pre-existing Acumatica Activites
-            Base.Activities.OrderByNew<OrderBy<Desc<CRActivity.startDate>>>(); 
+            // Base.Activities.OrderByNew<OrderBy<Desc<CRActivity.startDate>>>();
+            Base.GetExtension<VendorMaint_ActivityDetailsExt>().Activities.OrderByNew<OrderBy<Desc<CRActivity.startDate>>>(); // Base.Activities.OrderByNew<OrderBy<Desc<CRActivity.startDate>>>(); 
         }
           
     #region Event Handlers
