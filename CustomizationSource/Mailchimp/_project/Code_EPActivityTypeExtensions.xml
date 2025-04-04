@@ -11,19 +11,23 @@ using System;
 namespace Mailchimp
 {
         
-    [PXNonInstantiatedExtension]
-	public class EP_EPActivityType_ExistingColumn : PXCacheExtension<PX.Objects.EP.EPActivityType>
-	{
-        #region Application	
+   [PXNonInstantiatedExtension]
+  public class EP_EPActivityType_ExistingColumn : PXCacheExtension<PX.Objects.EP.EPActivityType>
+  {
+        #region Application  
         [PXMergeAttributes(Method = MergeMethod.Merge)]
         [PXRemoveBaseAttribute(typeof(PX.Objects.CR.PXActivityApplicationAttribute))]
-        [ActivityTypesApplicationAttribute]
-        [PXDBCalced(typeof(Switch<Case<Where<EPActivityType.type, Equal<MailchimpActivityType.mailchimpType>>, ActivityTypesApplicationAttribute.integration>,
-            Switch<Case<Where<EPActivityType.isInternal, Equal<False>>, ActivityTypesApplicationAttribute.portal>, ActivityTypesApplicationAttribute.backend>>),
-            typeof(int))]
+        [ActivityTypesApplicationAttribute] // Add "Integration" to the choices for EPActivityType
+
+        // In 2024 R2, Acuamtica removed the Calced statement from their code -- instead of this, just set the application on the EPActivityType MC to be "Integration"
+        /*[PXDBCalced(typeof(Switch<Case<Where<EPActivityType.type, Equal<MailchimpActivityType.mailchimpType>, ActivityTypesApplicationAttribute.integration>,
+            Switch<Case<Where<EPActivityType.isInternal, Equal<False>>, ActivityTypesApplicationAttribute.portal>, ActivityTypesApplicationAttribute.backend>>,
+            ActivityTypesApplicationAttribute.backend>), typeof(int))]*/
+
         public int? Application { get; set; }
         #endregion
 
     }
+
 }]]></CDATA>
 </Graph>

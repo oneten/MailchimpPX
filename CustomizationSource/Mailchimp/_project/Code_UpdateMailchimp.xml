@@ -37,7 +37,7 @@ namespace Mailchimp
         }
 
         [Serializable]
-        public class ContactMailchimpProcessFilter : IBqlTable
+        public class ContactMailchimpProcessFilter : PXBqlTable, IBqlTable
         {
             #region MailchimpList
             public abstract class mailchimpList : IBqlField { }

@@ -5,7 +5,7 @@ using PX.Data;
 namespace Mailchimp
 {
   [Serializable]
-  public class CRMailchimpList : IBqlTable
+  public class CRMailchimpList : PXBqlTable, IBqlTable
   {
     #region ListID
     [PXDBString(10, IsUnicode = true, InputMask = "")]

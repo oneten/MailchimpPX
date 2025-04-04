@@ -31,7 +31,9 @@ namespace Mailchimp
         {
             // Sort by StartDate (default is CreatedDateTime) so Mailchimp Activities are in sequence with pre-existing Acumatica Activites
             // Base.Activities.OrderByNew<OrderBy<Desc<CRActivity.startDate>>>();
-            Base.GetExtension<ContactMaint_ActivityDetailsExt>().Activities.OrderByNew<OrderBy<Desc<CRActivity.startDate>>>(); 
+            Base.GetExtension<ContactMaint_ActivityDetailsExt>().Activities.OrderByNew<OrderBy<Desc<CRActivity.startDate>>>();
+
+
         }
 
 
@@ -51,8 +53,10 @@ namespace Mailchimp
         [PXUIField(DisplayName = "Get Mailchimp Data")]
         protected virtual IEnumerable ActionGetMailchimpData(PXAdapter adapter)
         {
-            foreach (Contact contact in adapter.Get())
+            foreach (PXResult<Contact, BAccount> pxresult in adapter.Get())
             {
+                Contact contact = (Contact)pxresult;
+               
                 this.Base.Actions.PressSave();
 
                 PXLongOperation.StartOperation(Base, delegate ()
@@ -315,13 +319,15 @@ namespace Mailchimp
             }
             else
             {
-                mailChimpActivityType.Type = MailchimpActivityType.MC;
+                mailChimpActivityType.Type = MailchimpActivityType.MC; // string "MC"
                 mailChimpActivityType.Description = "Mailchimp";
                 mailChimpActivityType.Active = true;
                 mailChimpActivityType.ImageUrl = "main@Activity";
                 mailChimpActivityType.Incoming = true;
                 mailChimpActivityType.Outgoing = true;
-                mailChimpActivityType.IsInternal = false; // With IsInternal marked as false, will not be an option under the Add Activities menu of the Activities tab
+                mailChimpActivityType.Application = ActivityTypesApplicationAttribute.Integration;
+                //IsInternal removed in 2024R2 - mailChimpActivityType.IsInternal = false; // With IsInternal marked as false, will not be an option under the Add Activities menu of the Activities tab
+                    // In 2024 R2, doesn't show up in Add Activites unless it's marked Backend for the Application
 
                 graph.ActivityTypes.Insert(mailChimpActivityType);
                 graph.Actions.PressSave();
@@ -426,9 +432,25 @@ namespace Mailchimp
 
             foreach (CRPMTimeActivity acumaticaActivity in Base.GetExtension<ContactMaint_ActivityDetailsExt>().Activities.Select().RowCast<CRPMTimeActivity>().Where(ac => ac.Type == mCActivityType.Type))
              {
+                Debug.WriteLine(acumaticaActivity);
                  Base.GetExtension<ContactMaint_ActivityDetailsExt>().Activities.Delete(acumaticaActivity);
 
              }
+            // Base.Actions.PressSave();
+            // TODO 2024R2 -- the above code remove the items from the screen but when you refresh they come right back
+            //Base.Persist(); // This doesn't seem to help. Neither does Base.Save.Press();
+            //Base.Persist();
+
+            //journalEntry.GLTranModuleBatNbr.Delete(row);
+            //if (journalEntry.GLTranModuleBatNbr.Cache.Deleted.Any_())
+
+            /*if (Base.GetExtension<ContactMaint_ActivityDetailsExt>().Activities.Cache.Deleted.Any_())
+            {
+                Debug.WriteLine("delete");
+                Base.Persist();
+            }*/
+
+
         }
 
         // NB: This is a development tool that should be commented out before putting on production -- having the ability to delete and re-pull MC activities will help with testing/development
@@ -454,6 +476,8 @@ namespace Mailchimp
 
             Base.ContactCurrent.Update(contact);
             Base.Save.Press();
+
+            //Base.Caches.Clear();
 
             DeleteMailchimpActivities();
         }

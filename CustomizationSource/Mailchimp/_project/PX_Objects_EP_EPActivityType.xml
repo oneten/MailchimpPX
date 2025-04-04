@@ -1,0 +1,3 @@
+﻿<DAC type="PX.Objects.EP.EPActivityType">
+    <Field FieldName="Application" TypeName="int" OverrideClassName="PX.Objects.EP.EPActivityType" StorageName="ExistingColumn" />
+</DAC>
